@@ -1,0 +1,44 @@
+{
+  "name": "mesob-food-ordering",
+  "version": "1.0.0",
+  "description": "Enterprise-level food ordering platform using MERN stack",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:restaurant\" \"npm run dev:order\" \"npm run dev:payment\" \"npm run dev:delivery\"",
+    "dev:auth": "npm run dev --workspace=packages/auth-service",
+    "dev:restaurant": "npm run dev --workspace=packages/restaurant-service",
+    "dev:order": "npm run dev --workspace=packages/order-service",
+    "dev:payment": "npm run dev --workspace=packages/payment-service",
+    "dev:delivery": "npm run dev --workspace=packages/delivery-service",
+    "dev:customer-web": "npm run dev --workspace=packages/customer-web",
+    "dev:restaurant-dashboard": "npm run dev --workspace=packages/restaurant-dashboard",
+    "dev:admin-dashboard": "npm run dev --workspace=packages/admin-dashboard",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint packages/*/src --ext .js,.jsx",
+    "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json}\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.1",
+    "prettier": "^3.2.5",
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "food-ordering",
+    "delivery",
+    "mern-stack",
+    "monorepo",
+    "enterprise"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,21 @@
+{
+    "name": "@mesob/shared",
+    "version": "1.0.0",
+    "description": "Shared utilities, constants, and types for Mesob Food Ordering platform",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "keywords": [
+        "shared",
+        "utilities",
+        "constants"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "validator": "^13.11.0",
+        "mongoose": "^8.1.1",
+        "ioredis": "^5.3.2"
+    }
+}
