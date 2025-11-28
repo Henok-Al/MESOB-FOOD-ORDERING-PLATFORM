@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import {
     Box,
     Button,
@@ -26,19 +25,7 @@ import {
     Phone,
 } from '@mui/icons-material';
 import api from '../services/api';
-
-const validationSchema = Yup.object({
-    firstName: Yup.string().required('First name is required'),
-    lastName: Yup.string().required('Last name is required'),
-    email: Yup.string().email('Invalid email address').required('Email is required'),
-    phone: Yup.string().matches(/^[0-9]+$/, "Must be only digits").min(10, 'Must be at least 10 digits'),
-    password: Yup.string()
-        .min(8, 'Password must be at least 8 characters')
-        .required('Password is required'),
-    confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password'), undefined], 'Passwords must match')
-        .required('Confirm password is required'),
-});
+import { registerSchema } from '../validators/authSchemas';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -58,7 +45,21 @@ const Register: React.FC = () => {
             password: '',
             confirmPassword: '',
         },
-        validationSchema: validationSchema,
+        validate: (values) => {
+            try {
+                registerSchema.parse(values);
+                return {};
+            } catch (error: any) {
+                const errors: Record<string, string> = {};
+                error.errors?.forEach((err: any) => {
+                    const path = err.path[0];
+                    if (path) {
+                        errors[path] = err.message;
+                    }
+                });
+                return errors;
+            }
+        },
         onSubmit: async (values) => {
             setLoading(true);
             setError(null);

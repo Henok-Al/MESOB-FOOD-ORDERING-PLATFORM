@@ -4,6 +4,8 @@ import {
     createProduct,
 } from '../controllers/productController';
 import { protect, requirePermission, validateOwnership } from '../middleware/auth';
+import { validateBody } from '../middleware/validationMiddleware';
+import { createProductSchema } from '../validators/validationSchemas';
 
 const router = express.Router({ mergeParams: true });
 
@@ -14,6 +16,7 @@ router
         protect,
         requirePermission('menu:create'),
         validateOwnership('restaurant'),
+        validateBody(createProductSchema),
         createProduct
     );
 

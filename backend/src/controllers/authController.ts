@@ -3,9 +3,10 @@ import User, { IUser } from '../models/User';
 
 // @desc    Register user
 // @route   POST /api/auth/register
-// @access  Public
+// @access  Public  
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
+        // Data is already validated by middleware
         const { firstName, lastName, email, password, phone, role } = req.body;
 
         // Check if user exists
@@ -42,16 +43,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 // @access  Public
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
+        // Data is already validated by middleware
         const { email, password } = req.body;
-
-        // Validate email & password
-        if (!email || !password) {
-            res.status(400).json({
-                status: 'fail',
-                message: 'Please provide an email and password',
-            });
-            return;
-        }
 
         // Check for user
         const user = await User.findOne({ email }).select('+password');
