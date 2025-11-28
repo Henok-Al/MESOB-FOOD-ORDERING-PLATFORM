@@ -25,11 +25,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, restaurantId }) => {
         state.cart.items.find((item) => item._id === product._id)
     );
 
-    const handleAdd = () => {
+    const handleAdd = (e: React.MouseEvent) => {
+        e.stopPropagation();
         dispatch(addToCart({ product, restaurantId }));
     };
 
-    const handleRemove = () => {
+    const handleRemove = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (product._id) {
             dispatch(removeFromCart(product._id));
         }
