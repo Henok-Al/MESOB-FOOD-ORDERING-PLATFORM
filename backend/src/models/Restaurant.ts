@@ -11,6 +11,7 @@ export interface IRestaurant extends Document {
     deliveryTime: string;
     minOrder: number;
     isActive: boolean;
+    owner?: mongoose.Types.ObjectId;
     createdAt: Date;
 }
 
@@ -54,6 +55,10 @@ const restaurantSchema = new Schema<IRestaurant>({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
     },
     createdAt: {
         type: Date,

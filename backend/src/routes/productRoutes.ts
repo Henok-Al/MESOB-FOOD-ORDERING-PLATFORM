@@ -3,13 +3,18 @@ import {
     getProductsByRestaurant,
     createProduct,
 } from '../controllers/productController';
-import { protect, authorize } from '../middleware/auth';
+import { protect, requirePermission, validateOwnership } from '../middleware/auth';
 
 const router = express.Router({ mergeParams: true });
 
 router
     .route('/')
     .get(getProductsByRestaurant)
-    .post(protect, authorize('admin', 'restaurant_owner'), createProduct);
+    .post(
+        protect,
+        requirePermission('menu:create'),
+        validateOwnership('restaurant'),
+        createProduct
+    );
 
 export default router;

@@ -12,7 +12,8 @@
         "dev": "concurrently \"npm run dev:backend\" \"npm run dev:customer\"",
         "dev:backend": "npm run dev --workspace=backend",
         "dev:customer": "npm run dev --workspace=apps/customer-web",
-        "build": "npm run build --workspaces",
+        "dev:restaurant": "npm run dev --workspace=apps/restaurant-dashboard",
+        "build": "turbo run build",
         "test": "npm run test --workspaces",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     },

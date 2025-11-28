@@ -4,7 +4,7 @@ import {
     createRestaurant,
     seedRestaurants,
 } from '../controllers/restaurantController';
-import { protect, authorize } from '../middleware/auth';
+import { protect, requirePermission } from '../middleware/auth';
 
 // Include other resource routers
 import productRouter from './productRoutes';
@@ -17,7 +17,7 @@ router.use('/:restaurantId/products', productRouter);
 router
     .route('/')
     .get(getRestaurants)
-    .post(protect, authorize('admin', 'restaurant_owner'), createRestaurant);
+    .post(protect, requirePermission('restaurant:create'), createRestaurant);
 
 router.post('/seed', seedRestaurants);
 

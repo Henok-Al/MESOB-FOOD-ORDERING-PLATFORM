@@ -6,7 +6,9 @@
         "start": "node dist/server.js",
         "dev": "nodemon src/server.ts",
         "build": "tsc",
-        "test": "jest"
+        "test": "jest",
+        "seed:admin": "ts-node src/scripts/seedAdmin.ts",
+        "seed:owner": "ts-node src/scripts/seedRestaurantOwner.ts"
     },
     "dependencies": {
         "@food-ordering/constants": "*",
