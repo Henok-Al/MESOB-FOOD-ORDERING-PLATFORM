@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import restaurantRoutes from './routes/restaurantRoutes';
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 import { seedProducts } from './controllers/productController';
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/products', productRoutes); // Direct access if needed
 app.use('/api/orders', orderRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Nest products under restaurants
 // Note: In a real app, we'd mount this in restaurantRoutes.js, but for simplicity:

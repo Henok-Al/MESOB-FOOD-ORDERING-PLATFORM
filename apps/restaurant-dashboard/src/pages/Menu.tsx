@@ -32,6 +32,7 @@ import {
 } from '../components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { productFormSchema, type ProductFormData } from '../validators/productSchemas';
+import { ImageUpload } from '../components/ImageUpload';
 
 interface Product {
     _id: string;
@@ -337,11 +338,11 @@ const MenuPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="image">Image URL</Label>
-                                    <Input
-                                        id="image"
-                                        {...register('image')}
-                                        placeholder="https://example.com/image.jpg"
+                                    <Label>Product Image</Label>
+                                    <ImageUpload
+                                        value={watch('image')}
+                                        onChange={(url: string) => setValue('image', url)}
+                                        disabled={submitting}
                                     />
                                     {errors.image && (
                                         <p className="text-sm text-destructive">{errors.image.message}</p>
