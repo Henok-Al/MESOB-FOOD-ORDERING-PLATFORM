@@ -126,3 +126,85 @@ export const seedProducts = async (req: Request, res: Response): Promise<Respons
         res.status(400).json({ status: 'fail', message: error.message });
     }
 };
+
+export const getProductById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Product not found',
+            });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                product,
+            },
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            status: 'fail',
+            message: error.message,
+        });
+    }
+};
+
+export const updateProduct = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        const product = await Product.findByIdAndUpdate(productId, req.body, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!product) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Product not found',
+            });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                product,
+            },
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            status: 'fail',
+            message: error.message,
+        });
+    }
+};
+
+export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        const product = await Product.findByIdAndDelete(productId);
+
+        if (!product) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Product not found',
+            });
+            return;
+        }
+
+        res.status(204).json({
+            status: 'success',
+            data: null,
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            status: 'fail',
+            message: error.message,
+        });
+    }
+};

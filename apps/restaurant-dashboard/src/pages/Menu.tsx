@@ -122,16 +122,36 @@ const MenuPage: React.FC = () => {
             };
 
             if (editMode && selectedProduct) {
-                // Update logic here
-                alert('Update feature coming soon');
+                await api.put(`/restaurants/${restaurantId}/products/${selectedProduct}`, payload);
+                alert('Product updated successfully!');
             } else {
-                await api.post('/products', payload);
+                await api.post(`/restaurants/${restaurantId}/products`, payload);
+                alert('Product created successfully!');
             }
 
             fetchProducts();
             handleClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save product:', error);
+            alert(error.response?.data?.message || 'Failed to save product');
+        }
+    };
+
+    const handleDelete = async (productId: string) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) {
+            return;
+        }
+
+        try {
+            const restResponse = await api.get('/restaurants');
+            const restaurantId = restResponse.data.data.restaurants[0]._id;
+
+            await api.delete(`/restaurants/${restaurantId}/products/${productId}`);
+            alert('Product deleted successfully!');
+            fetchProducts();
+        } catch (error: any) {
+            console.error('Failed to delete product:', error);
+            alert(error.response?.data?.message || 'Failed to delete product');
         }
     };
 
@@ -201,7 +221,12 @@ const MenuPage: React.FC = () => {
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="text-destructive">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-destructive"
+                                                onClick={() => handleDelete(product._id)}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
