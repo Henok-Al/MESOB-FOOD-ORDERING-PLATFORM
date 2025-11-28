@@ -30,7 +30,7 @@ const Login: React.FC = () => {
         dispatch(loginStart());
         try {
             const response = await api.post('/auth/login', data);
-            const { user, token } = response.data;
+            const { token, data: user } = response.data;
 
             // Check if user is restaurant owner
             if (user.role !== 'restaurant_owner' && user.role !== 'admin') {
