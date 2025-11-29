@@ -13,6 +13,7 @@ import userRoutes from './routes/userRoutes';
 import profileRoutes from './routes/profileRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
 import { seedProducts } from './controllers/productController';
 
 const app = express();
