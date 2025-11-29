@@ -31,6 +31,7 @@ function App() {
                             <Route path="/orders" element={<Orders />} />
                             <Route path="/orders/:orderId/track" element={<OrderTracking />} />
                             <Route path="/profile" element={<Profile />} />
+                            <Route path="/notifications" element={<Notifications />} />
                         </Routes>
                     </BrowserRouter>
                 </ThemeProvider>
