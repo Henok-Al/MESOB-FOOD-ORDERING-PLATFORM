@@ -44,6 +44,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Nest products under restaurants
 // Note: In a real app, we'd mount this in restaurantRoutes.js, but for simplicity:
