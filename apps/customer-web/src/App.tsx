@@ -11,6 +11,7 @@ import RestaurantDetails from './pages/RestaurantDetails';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
+import OrderTracking from './pages/OrderTracking';
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function App() {
                             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
                             <Route path="/checkout" element={<Checkout />} />
                             <Route path="/orders" element={<Orders />} />
+                            <Route path="/orders/:orderId/track" element={<OrderTracking />} />
                             <Route path="/profile" element={<Profile />} />
                         </Routes>
                     </BrowserRouter>
