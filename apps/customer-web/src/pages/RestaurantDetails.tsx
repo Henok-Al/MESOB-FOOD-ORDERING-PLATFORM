@@ -9,6 +9,9 @@ import {
     Divider,
     CircularProgress,
     Chip,
+    Avatar,
+    Rating,
+    Pagination,
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, AccessTime, DeliveryDining } from '@mui/icons-material';
@@ -19,12 +22,35 @@ import { RootState } from '../store';
 import { clearCart } from '../store/slices/cartSlice';
 import { Restaurant, Product } from '@food-ordering/types';
 
+interface Review {
+    _id: string;
+    user: {
+        firstName: string;
+        lastName: string;
+    };
+    rating: number;
+    foodRating?: number;
+    serviceRating?: number;
+    deliveryRating?: number;
+    comment?: string;
+    photos?: string[];
+    helpfulCount: number;
+    restaurantResponse?: {
+        comment: string;
+        respondedAt: string;
+    };
+    createdAt: string;
+}
+
 const RestaurantDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviewsPage, setReviewsPage] = useState(1);
+    const [totalReviews, setTotalReviews] = useState(0);
     const [loading, setLoading] = useState(true);
 
     const cart = useSelector((state: RootState) => state.cart);
@@ -32,21 +58,17 @@ const RestaurantDetails: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // In a real app, we'd have a specific endpoint for getting a single restaurant
-                // For now, we'll fetch all and filter (not efficient but works for MVP)
-                // Or better, let's assume we can get it from the list if we had state management for restaurants
-                // But since we don't, let's just fetch products which is our main goal here
-
-                // Fetch products for this restaurant
+                // Fetch products
                 const productsResponse = await api.get(`/restaurants/${id}/products`);
                 setProducts(productsResponse.data.data.products);
 
-                // Fetch restaurant details (mocking it by fetching all and finding one for now as we didn't make a single rest endpoint)
-                // Ideally: await api.get(`/restaurants/${id}`)
+                // Fetch restaurant details
                 const restResponse = await api.get('/restaurants');
                 const found = restResponse.data.data.restaurants.find((r: any) => r._id === id || r.id === id);
                 if (found) setRestaurant(found);
 
+                // Fetch reviews
+                fetchReviews(1);
             } catch (error) {
                 console.error('Failed to fetch data:', error);
             } finally {
@@ -56,6 +78,29 @@ const RestaurantDetails: React.FC = () => {
 
         if (id) fetchData();
     }, [id]);
+
+    const fetchReviews = async (page: number) => {
+        try {
+            const response = await api.get(`/reviews/restaurant/${id}?page=${page}&limit=5`);
+            setReviews(response.data.data.reviews);
+            setTotalReviews(response.data.data.pagination.total);
+        } catch (error) {
+            console.error('Failed to fetch reviews:', error);
+        }
+    };
+
+    const handleReviewPageChange = (_: any, page: number) => {
+        setReviewsPage(page);
+        fetchReviews(page);
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    };
 
     if (loading) {
         return (
@@ -143,6 +188,106 @@ const RestaurantDetails: React.FC = () => {
                                 ))}
                             </Grid>
                         )}
+
+                        {/* Reviews Section */}
+                        <Box sx={{ mt: 6 }}>
+                            <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+                                Customer Reviews ({totalReviews})
+                            </Typography>
+
+                            {reviews.length === 0 ? (
+                                <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3 }}>
+                                    <Typography color="text.secondary">
+                                        No reviews yet. Be the first to review!
+                                    </Typography>
+                                </Paper>
+                            ) : (
+                                <>
+                                    {reviews.map((review) => (
+                                        <Paper key={review._id} sx={{ p: 3, mb: 2, borderRadius: 3 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                                    <Avatar sx={{ bgcolor: 'primary.main' }}>
+                                                        {review.user.firstName[0]}{review.user.lastName[0]}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography fontWeight="bold">
+                                                            {review.user.firstName} {review.user.lastName}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            {formatDate(review.createdAt)}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Rating value={review.rating} readOnly size="small" />
+                                            </Box>
+
+                                            {/* Detailed Ratings */}
+                                            {(review.foodRating || review.serviceRating || review.deliveryRating) && (
+                                                <Box sx={{ display: 'flex', gap: 3, mb: 2 }}>
+                                                    {review.foodRating && (
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                Food
+                                                            </Typography>
+                                                            <Rating value={review.foodRating} readOnly size="small" />
+                                                        </Box>
+                                                    )}
+                                                    {review.serviceRating && (
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                Service
+                                                            </Typography>
+                                                            <Rating value={review.serviceRating} readOnly size="small" />
+                                                        </Box>
+                                                    )}
+                                                    {review.deliveryRating && (
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                Delivery
+                                                            </Typography>
+                                                            <Rating value={review.deliveryRating} readOnly size="small" />
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            )}
+
+                                            {review.comment && (
+                                                <Typography variant="body2" sx={{ mb: 2 }}>
+                                                    {review.comment}
+                                                </Typography>
+                                            )}
+
+                                            {/* Restaurant Response */}
+                                            {review.restaurantResponse && (
+                                                <Box sx={{ mt: 2, p: 2, bgcolor: '#F5F6FA', borderRadius: 2 }}>
+                                                    <Typography variant="body2" fontWeight="bold" gutterBottom>
+                                                        Response from {restaurant.name}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {review.restaurantResponse.comment}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {formatDate(review.restaurantResponse.respondedAt)}
+                                                    </Typography>
+                                                </Box>
+                                            )}
+                                        </Paper>
+                                    ))}
+
+                                    {totalReviews > 5 && (
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                                            <Pagination
+                                                count={Math.ceil(totalReviews / 5)}
+                                                page={reviewsPage}
+                                                onChange={handleReviewPageChange}
+                                                color="primary"
+                                            />
+                                        </Box>
+                                    )}
+                                </>
+                            )}
+                        </Box>
                     </Grid>
 
                     {/* Cart Sidebar */}
