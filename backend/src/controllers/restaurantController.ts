@@ -48,6 +48,7 @@ export const seedRestaurants = async (req: Request, res: Response): Promise<void
             {
                 name: 'Burger King',
                 description: 'American, Fast Food, Burgers',
+                cuisine: 'American',
                 address: '123 Main St',
                 rating: 4.2,
                 imageUrl: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80',
@@ -57,6 +58,7 @@ export const seedRestaurants = async (req: Request, res: Response): Promise<void
             {
                 name: 'Pizza Hut',
                 description: 'Italian, Pizza, Fast Food',
+                cuisine: 'Italian',
                 address: '456 Oak Ave',
                 rating: 4.5,
                 imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -66,6 +68,7 @@ export const seedRestaurants = async (req: Request, res: Response): Promise<void
             {
                 name: 'Sushi Master',
                 description: 'Japanese, Sushi, Asian',
+                cuisine: 'Japanese',
                 address: '789 Pine Ln',
                 rating: 4.8,
                 imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -74,6 +77,104 @@ export const seedRestaurants = async (req: Request, res: Response): Promise<void
             },
         ]);
         res.status(201).json({ status: 'success', message: 'Seeded successfully' });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+// @desc    Get all restaurants (Admin)
+// @route   GET /api/restaurants/admin/all
+// @access  Private (Admin)
+export const getAllRestaurants = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurants = await Restaurant.find().sort({ createdAt: -1 });
+        res.status(200).json({
+            status: 'success',
+            results: restaurants.length,
+            data: { restaurants },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Get restaurant by ID
+// @route   GET /api/restaurants/:id
+// @access  Public
+export const getRestaurantById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id);
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+        res.status(200).json({
+            status: 'success',
+            data: { restaurant },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Update restaurant
+// @route   PATCH /api/restaurants/:id
+// @access  Private (Owner/Admin)
+export const updateRestaurant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+        res.status(200).json({
+            status: 'success',
+            data: { restaurant },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Delete restaurant
+// @route   DELETE /api/restaurants/:id
+// @access  Private (Admin)
+export const deleteRestaurant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurant = await Restaurant.findByIdAndDelete(req.params.id);
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+        res.status(204).json({ status: 'success', data: null });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Update restaurant status
+// @route   PATCH /api/restaurants/:id/status
+// @access  Private (Admin)
+export const updateRestaurantStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { status } = req.body;
+        const restaurant = await Restaurant.findByIdAndUpdate(
+            req.params.id,
+            { status, isActive: status === 'approved' },
+            { new: true, runValidators: true }
+        );
+
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { restaurant },
+        });
     } catch (error: any) {
         res.status(400).json({ status: 'fail', message: error.message });
     }

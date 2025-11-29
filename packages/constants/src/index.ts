@@ -2,7 +2,7 @@ export const APP_NAME = 'Mesob Food Ordering';
 
 export enum UserRole {
     CUSTOMER = 'customer',
-    RESTAURANT = 'restaurant',
+    RESTAURANT_OWNER = 'restaurant_owner',
     DRIVER = 'driver',
     ADMIN = 'admin',
 }
@@ -12,8 +12,13 @@ export enum OrderStatus {
     CONFIRMED = 'confirmed',
     PREPARING = 'preparing',
     READY = 'ready',
-    PICKED_UP = 'picked_up',
-    ON_THE_WAY = 'on_the_way',
+    OUT_FOR_DELIVERY = 'out_for_delivery',
     DELIVERED = 'delivered',
     CANCELLED = 'cancelled',
+}
+
+export enum RestaurantStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
 }

@@ -22,6 +22,26 @@ export const getProductsByRestaurant = async (req: Request, res: Response): Prom
     }
 };
 
+export const getAdminProductsByRestaurant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { restaurantId } = req.params;
+        const products = await Product.find({ restaurant: restaurantId });
+
+        res.status(200).json({
+            status: 'success',
+            results: products.length,
+            data: {
+                products,
+            },
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            status: 'fail',
+            message: error.message,
+        });
+    }
+};
+
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const product = await Product.create(req.body);
@@ -127,46 +147,15 @@ export const seedProducts = async (req: Request, res: Response): Promise<Respons
     }
 };
 
-export const getProductById = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { productId } = req.params;
-        const product = await Product.findById(productId);
-
-        if (!product) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Product not found',
-            });
-            return;
-        }
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                product,
-            },
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            status: 'fail',
-            message: error.message,
-        });
-    }
-};
-
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { productId } = req.params;
-        const product = await Product.findByIdAndUpdate(productId, req.body, {
+        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true,
         });
 
         if (!product) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Product not found',
-            });
+            res.status(404).json({ status: 'fail', message: 'Product not found' });
             return;
         }
 
@@ -186,14 +175,10 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { productId } = req.params;
-        const product = await Product.findByIdAndDelete(productId);
+        const product = await Product.findByIdAndDelete(req.params.id);
 
         if (!product) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Product not found',
-            });
+            res.status(404).json({ status: 'fail', message: 'Product not found' });
             return;
         }
 

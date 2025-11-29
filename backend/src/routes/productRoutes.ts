@@ -1,48 +1,43 @@
 import express from 'express';
 import {
     getProductsByRestaurant,
+    getAdminProductsByRestaurant,
     createProduct,
-    getProductById,
     updateProduct,
     deleteProduct,
 } from '../controllers/productController';
 import { protect, requirePermission, validateOwnership } from '../middleware/auth';
-import { validateBody, validateParams } from '../middleware/validationMiddleware';
-import { createProductSchema, updateProductSchema } from '../validators/validationSchemas';
-import { z } from 'zod';
+import { Permission } from '../config/permissions';
+import { validateBody } from '../middleware/validationMiddleware';
+import { createProductSchema } from '../validators/validationSchemas';
 
 const router = express.Router({ mergeParams: true });
 
-// ID validation schema
-const productIdSchema = z.object({
-    productId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid product ID'),
-});
+router.get('/admin/all', protect, requirePermission(Permission.VIEW_MENU), getAdminProductsByRestaurant);
 
 router
     .route('/')
     .get(getProductsByRestaurant)
     .post(
         protect,
-        requirePermission('menu:create'),
+        requirePermission(Permission.CREATE_MENU),
         validateOwnership('restaurant'),
         validateBody(createProductSchema),
         createProduct
     );
 
 router
-    .route('/:productId')
-    .get(validateParams(productIdSchema), getProductById)
-    .put(
+    .route('/:id')
+    .patch(
         protect,
-        requirePermission('menu:update'),
-        validateParams(productIdSchema),
-        validateBody(updateProductSchema),
+        requirePermission(Permission.UPDATE_MENU),
+        validateOwnership('product'),
         updateProduct
     )
     .delete(
         protect,
-        requirePermission('menu:delete'),
-        validateParams(productIdSchema),
+        requirePermission(Permission.DELETE_MENU),
+        validateOwnership('product'),
         deleteProduct
     );
 

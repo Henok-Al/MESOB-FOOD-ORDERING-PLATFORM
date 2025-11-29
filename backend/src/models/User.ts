@@ -1,6 +1,15 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { UserRole } from '@food-ordering/constants';
+
+export interface IAddress {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    isDefault: boolean;
+}
 
 export interface IUser extends Document {
     firstName: string;
@@ -8,11 +17,20 @@ export interface IUser extends Document {
     email: string;
     phone?: string;
     password?: string;
-    role: 'customer' | 'restaurant_owner' | 'admin' | 'driver';
+    role: UserRole;
+    addresses: IAddress[];
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
     getSignedJwtToken(): string;
 }
+
+const addressSchema = new Schema<IAddress>({
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
+});
 
 const userSchema = new Schema<IUser>({
     firstName: {
@@ -47,9 +65,10 @@ const userSchema = new Schema<IUser>({
     },
     role: {
         type: String,
-        enum: ['customer', 'restaurant_owner', 'admin', 'driver'],
-        default: 'customer',
+        enum: Object.values(UserRole),
+        default: UserRole.CUSTOMER,
     },
+    addresses: [addressSchema],
     createdAt: {
         type: Date,
         default: Date.now,

@@ -24,7 +24,6 @@ const Checkout: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const cart = useSelector((state: RootState) => state.cart);
-    const { user } = useSelector((state: RootState) => state.auth);
 
     const [address, setAddress] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('card');

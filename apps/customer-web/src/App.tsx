@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
@@ -11,6 +10,7 @@ import Register from './pages/Register';
 import RestaurantDetails from './pages/RestaurantDetails';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
+import Profile from './pages/Profile';
 
 const queryClient = new QueryClient();
 
@@ -28,6 +28,7 @@ function App() {
                             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
                             <Route path="/checkout" element={<Checkout />} />
                             <Route path="/orders" element={<Orders />} />
+                            <Route path="/profile" element={<Profile />} />
                         </Routes>
                     </BrowserRouter>
                 </ThemeProvider>

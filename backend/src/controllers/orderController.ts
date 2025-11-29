@@ -87,3 +87,81 @@ export const getOrderById = async (req: Request, res: Response): Promise<void> =
         });
     }
 };
+
+// @desc    Get orders by restaurant
+// @route   GET /api/restaurants/:restaurantId/orders
+// @access  Private (Restaurant Owner/Admin)
+export const getOrdersByRestaurant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { restaurantId } = req.params;
+        const orders = await Order.find({ restaurant: restaurantId })
+            .populate('user', 'firstName lastName email')
+            .populate('restaurant', 'name')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            status: 'success',
+            results: orders.length,
+            data: { orders },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Get all orders (Admin)
+// @route   GET /api/orders/admin/all
+// @access  Private (Admin)
+export const getAllOrders = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const orders = await Order.find()
+            .populate('user', 'firstName lastName email')
+            .populate('restaurant', 'name')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            status: 'success',
+            results: orders.length,
+            data: { orders },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Update order status
+// @route   PATCH /api/orders/:id/status
+// @access  Private (Restaurant Owner/Admin)
+export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const order = await Order.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
+        ).populate('user', 'firstName lastName email');
+
+        if (!order) {
+            res.status(404).json({ status: 'fail', message: 'Order not found' });
+            return;
+        }
+
+        // Emit socket event for real-time updates
+        const io = req.app.get('io');
+        if (io) {
+            // Notify the customer
+            io.to(order.user.toString()).emit('orderStatusUpdated', order);
+            // Notify restaurant dashboard
+            io.to(`restaurant-${order.restaurant}`).emit('orderUpdated', order);
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { order },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};

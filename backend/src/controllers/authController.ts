@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import User, { IUser } from '../models/User';
+import { UserRole } from '@food-ordering/constants';
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -26,7 +27,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             email,
             password,
             phone,
-            role: role || 'customer',
+            role: role || UserRole.CUSTOMER,
         });
 
         sendTokenResponse(user, 201, res);

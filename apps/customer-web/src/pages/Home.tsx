@@ -10,7 +10,7 @@ import {
     IconButton,
     CircularProgress,
 } from '@mui/material';
-import { Search, LocationOn } from '@mui/icons-material';
+import { Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
@@ -25,6 +25,8 @@ const Home: React.FC = () => {
     const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cuisineFilter, setCuisineFilter] = useState('');
 
     useEffect(() => {
         const fetchRestaurants = async () => {
@@ -46,6 +48,14 @@ const Home: React.FC = () => {
         navigate('/login');
     };
 
+    const filteredRestaurants = restaurants.filter(restaurant => {
+        const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCuisine = cuisineFilter ? restaurant.cuisine.toLowerCase().includes(cuisineFilter.toLowerCase()) : true;
+        return matchesSearch && matchesCuisine;
+    });
+
+    const uniqueCuisines = Array.from(new Set(restaurants.map(r => r.cuisine)));
+
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#F5F6FA' }}>
             {/* Header / Hero Section */}
@@ -57,7 +67,9 @@ const Home: React.FC = () => {
                         </Typography>
                         {isAuthenticated ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography fontWeight="500">Hi, {user?.firstName}</Typography>
+                                <Button variant="text" onClick={() => navigate('/profile')}>
+                                    Hi, {user?.firstName}
+                                </Button>
                                 <Button variant="outlined" color="inherit" onClick={handleLogout} size="small">
                                     Logout
                                 </Button>
@@ -90,21 +102,39 @@ const Home: React.FC = () => {
                                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                             }}
                         >
-                            <IconButton sx={{ p: '10px' }} aria-label="location">
-                                <LocationOn color="primary" />
+                            <IconButton sx={{ p: '10px' }} aria-label="search">
+                                <Search color="primary" />
                             </IconButton>
                             <InputBase
                                 sx={{ ml: 1, flex: 1 }}
-                                placeholder="Enter your delivery address"
-                                inputProps={{ 'aria-label': 'search google maps' }}
+                                placeholder="Search restaurants..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <Button
-                                variant="contained"
-                                sx={{ borderRadius: '50px', px: 4, py: 1.5, m: 0.5 }}
-                            >
-                                Search
-                            </Button>
                         </Paper>
+
+                        {/* Cuisine Filter Chips */}
+                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
+                            <Button
+                                variant={cuisineFilter === '' ? "contained" : "outlined"}
+                                onClick={() => setCuisineFilter('')}
+                                size="small"
+                                sx={{ borderRadius: 20 }}
+                            >
+                                All
+                            </Button>
+                            {uniqueCuisines.map(cuisine => (
+                                <Button
+                                    key={cuisine}
+                                    variant={cuisineFilter === cuisine ? "contained" : "outlined"}
+                                    onClick={() => setCuisineFilter(cuisine)}
+                                    size="small"
+                                    sx={{ borderRadius: 20 }}
+                                >
+                                    {cuisine}
+                                </Button>
+                            ))}
+                        </Box>
                     </Box>
                 </Container>
             </Box>
@@ -112,7 +142,7 @@ const Home: React.FC = () => {
             {/* Restaurant Listing */}
             <Container maxWidth="xl" sx={{ py: 6 }}>
                 <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 4 }}>
-                    Popular Restaurants
+                    {searchTerm || cuisineFilter ? 'Search Results' : 'Popular Restaurants'}
                 </Typography>
 
                 {loading ? (
@@ -121,11 +151,19 @@ const Home: React.FC = () => {
                     </Box>
                 ) : (
                     <Grid container spacing={3}>
-                        {restaurants.map((restaurant) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={restaurant._id || restaurant.id}>
-                                <RestaurantCard restaurant={restaurant} />
-                            </Grid>
-                        ))}
+                        {filteredRestaurants.length > 0 ? (
+                            filteredRestaurants.map((restaurant) => (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={restaurant._id || restaurant.id}>
+                                    <RestaurantCard restaurant={restaurant} />
+                                </Grid>
+                            ))
+                        ) : (
+                            <Box sx={{ width: '100%', textAlign: 'center', py: 8 }}>
+                                <Typography variant="h6" color="text.secondary">
+                                    No restaurants found matching your criteria.
+                                </Typography>
+                            </Box>
+                        )}
                     </Grid>
                 )}
             </Container>

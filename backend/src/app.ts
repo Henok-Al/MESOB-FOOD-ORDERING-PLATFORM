@@ -8,7 +8,11 @@ import authRoutes from './routes/authRoutes';
 import restaurantRoutes from './routes/restaurantRoutes';
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
-import uploadRoutes from './routes/uploadRoutes';
+import paymentRoutes from './routes/paymentRoutes';
+import userRoutes from './routes/userRoutes';
+import profileRoutes from './routes/profileRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 import { seedProducts } from './controllers/productController';
 
 const app = express();
@@ -19,6 +23,9 @@ const io = new Server(httpServer, {
         methods: ['GET', 'POST']
     }
 });
+
+// Store io instance for access in controllers
+app.set('io', io);
 
 // Middleware
 app.use(helmet());
@@ -31,7 +38,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/products', productRoutes); // Direct access if needed
 app.use('/api/orders', orderRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Nest products under restaurants
 // Note: In a real app, we'd mount this in restaurantRoutes.js, but for simplicity:
@@ -43,6 +54,18 @@ app.post('/api/products/seed', seedProducts);
 // Socket.io connection
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
+
+    // Join user-specific room
+    socket.on('join', (userId: string) => {
+        socket.join(userId);
+        console.log(`User ${userId} joined their room`);
+    });
+
+    // Join restaurant-specific room
+    socket.on('joinRestaurant', (restaurantId: string) => {
+        socket.join(`restaurant-${restaurantId}`);
+        console.log(`Restaurant ${restaurantId} dashboard joined`);
+    });
 
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);

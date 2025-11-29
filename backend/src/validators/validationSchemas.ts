@@ -59,6 +59,10 @@ export const createRestaurantSchema = z.object({
         .min(1, 'Restaurant name is required')
         .max(100, 'Restaurant name must be less than 100 characters')
         .trim(),
+    cuisine: z.string()
+        .min(1, 'Cuisine type is required')
+        .max(50, 'Cuisine type must be less than 50 characters')
+        .trim(),
     description: z.string()
         .min(10, 'Description must be at least 10 characters')
         .max(500, 'Description must be less than 500 characters')

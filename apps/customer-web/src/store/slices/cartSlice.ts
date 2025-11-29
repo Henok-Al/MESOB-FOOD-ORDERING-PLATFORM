@@ -21,8 +21,8 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addToCart: (state, action: PayloadAction<{ product: Product; restaurantId: string; quantity?: number }>) => {
-            const { product, restaurantId, quantity = 1 } = action.payload;
+        addToCart: (state, action: PayloadAction<{ product: Product; restaurantId: string }>) => {
+            const { product, restaurantId } = action.payload;
 
             // Check if adding from a different restaurant
             if (state.restaurantId && state.restaurantId !== restaurantId) {
@@ -34,11 +34,11 @@ const cartSlice = createSlice({
 
             const existingItem = state.items.find((item) => item._id === product._id);
             if (existingItem) {
-                existingItem.quantity += quantity;
+                existingItem.quantity += 1;
             } else {
-                state.items.push({ ...product, quantity });
+                state.items.push({ ...product, quantity: 1 });
             }
-            state.total += product.price * quantity;
+            state.total += product.price;
         },
         removeFromCart: (state, action: PayloadAction<string>) => {
             const id = action.payload;

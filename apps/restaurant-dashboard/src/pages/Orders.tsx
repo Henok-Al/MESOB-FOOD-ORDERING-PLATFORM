@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { MoreHorizontal, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Loader2, Filter } from 'lucide-react';
+import { io, Socket } from 'socket.io-client';
 import api from '../services/api';
 import { Button } from '../components/ui/button';
 import {
@@ -18,6 +19,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '../components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 interface Order {
@@ -42,10 +50,15 @@ interface Order {
 const OrdersPage: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+    const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     const fetchOrders = async () => {
         try {
-            const response = await api.get('/orders/restaurant-orders');
+            const restResponse = await api.get('/restaurants');
+            const restaurantId = restResponse.data.data.restaurants[0]._id;
+
+            const response = await api.get(`/orders/restaurant/${restaurantId}`);
             setOrders(response.data.data.orders);
         } catch (error) {
             console.error('Failed to fetch orders:', error);
@@ -56,7 +69,46 @@ const OrdersPage: React.FC = () => {
 
     useEffect(() => {
         fetchOrders();
+        initializeSocket();
+
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
     }, []);
+
+    const initializeSocket = () => {
+        const socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
+
+        socketInstance.on('connect', async () => {
+            console.log('Socket connected');
+            // Join restaurant room
+            try {
+                const restResponse = await api.get('/restaurants');
+                const restaurantId = restResponse.data.data.restaurants[0]._id;
+                socketInstance.emit('joinRestaurant', restaurantId);
+            } catch (error) {
+                console.error('Failed to join restaurant room:', error);
+            }
+        });
+
+        socketInstance.on('orderUpdated', (updatedOrder: Order) => {
+            console.log('Order updated:', updatedOrder);
+            setOrders((prev) =>
+                prev.map((order) =>
+                    order._id === updatedOrder._id ? updatedOrder : order
+                )
+            );
+        });
+
+        socketInstance.on('newOrder', (newOrder: Order) => {
+            console.log('New order received:', newOrder);
+            setOrders((prev) => [newOrder, ...prev]);
+        });
+
+        setSocket(socketInstance);
+    };
 
     const handleStatusUpdate = async (orderId: string, status: string) => {
         try {
@@ -80,9 +132,32 @@ const OrdersPage: React.FC = () => {
         }
     };
 
+    const filteredOrders = filterStatus === 'all'
+        ? orders
+        : orders.filter((order) => order.status === filterStatus);
+
     return (
         <div className="space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
+            <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
+                <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Orders</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="preparing">Preparing</SelectItem>
+                            <SelectItem value="ready">Ready</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
 
             {loading ? (
                 <div className="flex justify-center p-8">
@@ -107,7 +182,7 @@ const OrdersPage: React.FC = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {orders.map((order) => (
+                                {filteredOrders.map((order) => (
                                     <TableRow key={order._id}>
                                         <TableCell className="font-medium">
                                             #{order._id.slice(-6).toUpperCase()}

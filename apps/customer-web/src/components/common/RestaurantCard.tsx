@@ -9,7 +9,7 @@ import {
     Rating,
     IconButton,
 } from '@mui/material';
-import { FavoriteBorder, AccessTime, DeliveryDining } from '@mui/icons-material';
+import { FavoriteBorder, DeliveryDining } from '@mui/icons-material';
 import { Restaurant } from '@food-ordering/types';
 
 import { useNavigate } from 'react-router-dom';

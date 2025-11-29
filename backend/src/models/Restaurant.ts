@@ -5,12 +5,14 @@ export interface IRestaurant extends Document {
     name: string;
     slug?: string;
     description?: string;
+    cuisine: string;
     address: string;
     rating: number;
     imageUrl: string;
     deliveryTime: string;
     minOrder: number;
     isActive: boolean;
+    status: 'pending' | 'approved' | 'rejected';
     owner?: mongoose.Types.ObjectId;
     createdAt: Date;
 }
@@ -28,6 +30,11 @@ const restaurantSchema = new Schema<IRestaurant>({
     },
     description: {
         type: String,
+        trim: true,
+    },
+    cuisine: {
+        type: String,
+        required: [true, 'Cuisine type is required'],
         trim: true,
     },
     address: {
@@ -55,6 +62,11 @@ const restaurantSchema = new Schema<IRestaurant>({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending',
     },
     owner: {
         type: Schema.Types.ObjectId,

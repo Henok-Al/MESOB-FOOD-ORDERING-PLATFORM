@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 import { Permission, Role, hasPermission } from '../config/permissions';
+import { UserRole } from '@food-ordering/constants';
 
 // Extend Express Request to include user
 declare global {
@@ -91,7 +92,7 @@ export const validateOwnership = (modelName: 'restaurant' | 'order' | 'product')
         }
 
         // Admin bypass
-        if (req.user.role === Role.ADMIN) {
+        if (req.user.role === UserRole.ADMIN) {
             return next();
         }
 
