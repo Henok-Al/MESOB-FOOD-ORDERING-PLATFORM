@@ -12,6 +12,7 @@ import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import OrderTracking from './pages/OrderTracking';
+import Notifications from './pages/Notifications';
 
 const queryClient = new QueryClient();
 
