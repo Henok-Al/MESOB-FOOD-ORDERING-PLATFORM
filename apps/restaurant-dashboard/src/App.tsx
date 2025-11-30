@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Layout from './components/Layout';
 import MenuPage from './pages/Menu';
 import OrdersPage from './pages/Orders';
+import Analytics from './pages/Analytics';
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <OrdersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute>
+                    <Analytics />
                   </ProtectedRoute>
                 }
               />
