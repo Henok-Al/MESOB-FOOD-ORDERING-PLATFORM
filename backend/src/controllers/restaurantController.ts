@@ -3,13 +3,63 @@ import Restaurant from '../models/Restaurant';
 
 export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
     try {
-        const restaurants = await Restaurant.find({ isActive: true });
+        // Pagination
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page - 1) * limit;
+
+        // Build query
+        const query: any = { isActive: true };
+
+        // Search by name
+        if (req.query.search) {
+            query.name = { $regex: req.query.search, $options: 'i' };
+        }
+
+        // Filter by cuisine
+        if (req.query.cuisine) {
+            query.cuisine = { $regex: req.query.cuisine, $options: 'i' };
+        }
+
+        // Filter by rating
+        if (req.query.minRating) {
+            query.rating = { $gte: parseFloat(req.query.minRating as string) };
+        }
+
+        // Filter by delivery time
+        if (req.query.maxDeliveryTime) {
+            query.deliveryTime = { $lte: req.query.maxDeliveryTime };
+        }
+
+        // Sorting
+        let sort: any = {};
+        if (req.query.sortBy) {
+            const sortField = req.query.sortBy as string;
+            const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
+            sort[sortField] = sortOrder;
+        } else {
+            sort = { createdAt: -1 }; // Default sort by newest
+        }
+
+        // Execute query
+        const restaurants = await Restaurant.find(query)
+            .sort(sort)
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Restaurant.countDocuments(query);
 
         res.status(200).json({
             status: 'success',
             results: restaurants.length,
             data: {
                 restaurants,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit),
+                },
             },
         });
     } catch (error: any) {

@@ -6,13 +6,48 @@ import User from '../models/User';
 // @access  Private (Admin)
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        // Pagination
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page - 1) * limit;
+
+        // Build query
+        const query: any = {};
+
+        // Filter by role
+        if (req.query.role) {
+            query.role = req.query.role;
+        }
+
+        // Search by name or email
+        if (req.query.search) {
+            query.$or = [
+                { firstName: { $regex: req.query.search, $options: 'i' } },
+                { lastName: { $regex: req.query.search, $options: 'i' } },
+                { email: { $regex: req.query.search, $options: 'i' } },
+            ];
+        }
+
+        // Execute query
+        const users = await User.find(query)
+            .select('-password')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await User.countDocuments(query);
 
         res.status(200).json({
             status: 'success',
             results: users.length,
             data: {
                 users,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit),
+                },
             },
         });
     } catch (error: any) {
