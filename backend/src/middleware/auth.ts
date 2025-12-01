@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
-import { Permission, Role, hasPermission } from '../config/permissions';
+import { Permission, hasPermission } from '../config/permissions';
 import { UserRole } from '@food-ordering/constants';
 
 // Extend Express Request to include user
@@ -54,7 +54,7 @@ export const requirePermission = (permission: Permission) => {
             return res.status(401).json({ success: false, message: 'Authentication required' });
         }
 
-        const userRole = req.user.role as Role;
+        const userRole = req.user.role as UserRole;
 
         if (!hasPermission(userRole, permission)) {
             return res.status(403).json({
@@ -67,7 +67,23 @@ export const requirePermission = (permission: Permission) => {
     };
 };
 
-// Legacy role-based authorization (deprecated - use requirePermission instead)
+// Require specific role
+export const requireRole = (role: UserRole) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (!req.user) {
+            res.status(401).json({ status: 'fail', message: 'Not authenticated' });
+            return;
+        }
+
+        if (req.user.role !== role) {
+            res.status(403).json({ status: 'fail', message: 'Insufficient permissions' });
+            return;
+        }
+        next();
+    };
+};
+
+// Legacy role-based authorization (deprecated - use requirePermission or requireRole instead)
 export const authorize = (...roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user) {
