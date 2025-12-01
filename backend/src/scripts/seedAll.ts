@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import User from '../models/User';
 import Restaurant from '../models/Restaurant';
 import Product from '../models/Product';
-import { Role } from '../config/permissions';
+import { UserRole } from '@food-ordering/constants';
 import path from 'path';
 import readline from 'readline';
 
@@ -50,7 +50,7 @@ const seedAll = async () => {
             lastName: 'User',
             email: 'admin@mesob.com',
             password: 'Admin@123',
-            role: Role.ADMIN,
+            role: UserRole.ADMIN,
             phone: '+251911234567',
         });
         console.log(`✅ Admin created: ${admin.email}`);
@@ -62,7 +62,7 @@ const seedAll = async () => {
             lastName: 'Owner',
             email: 'owner@mesob.com',
             password: 'Owner@123',
-            role: Role.RESTAURANT_OWNER,
+            role: UserRole.RESTAURANT_OWNER,
             phone: '+251911234568',
         });
 

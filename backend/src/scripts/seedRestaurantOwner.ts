@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import User from '../models/User';
 import Restaurant from '../models/Restaurant';
-import { Role } from '../config/permissions';
+import { UserRole } from '@food-ordering/constants';
 import path from 'path';
 
 // Load env vars from backend/.env
@@ -29,7 +29,7 @@ const seedRestaurantOwner = async () => {
             lastName: 'Owner',
             email: 'owner@mesob.com',
             password: 'Owner@123',
-            role: Role.RESTAURANT_OWNER,
+            role: UserRole.RESTAURANT_OWNER,
             phone: '+251911234568'
         });
 

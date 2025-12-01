@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import User from '../models/User';
-import { Role } from '../config/permissions';
+import { UserRole } from '@food-ordering/constants';
 import path from 'path';
 
 // Load env vars from backend/.env
@@ -29,7 +29,7 @@ const seedAdmin = async () => {
             lastName: 'User',
             email: 'admin@mesob.com',
             password: 'Admin@123', // Password will be hashed by pre-save hook
-            role: Role.ADMIN,
+            role: UserRole.ADMIN,
             phone: '+251911234567'
         });
 

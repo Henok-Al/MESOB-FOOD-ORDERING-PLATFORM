@@ -7,6 +7,7 @@ import {
     getPaymentByOrderController,
 } from '../controllers/paymentController';
 import { protect, requirePermission } from '../middleware/auth';
+import { Permission } from '../config/permissions';
 
 const router = express.Router();
 
@@ -14,18 +15,18 @@ const router = express.Router();
 router.use(protect);
 
 // Create payment intent
-router.post('/create-intent', requirePermission('order:create'), createPaymentIntentController);
+router.post('/create-intent', requirePermission(Permission.CREATE_ORDER), createPaymentIntentController);
 
 // Confirm payment and create order
-router.post('/confirm', requirePermission('order:create'), confirmPaymentController);
+router.post('/confirm', requirePermission(Permission.CREATE_ORDER), confirmPaymentController);
 
 // Get payment history for logged in user
-router.get('/history', requirePermission('order:view'), getPaymentHistoryController);
+router.get('/history', requirePermission(Permission.VIEW_ORDERS), getPaymentHistoryController);
 
 // Get payment by order ID
-router.get('/order/:orderId', requirePermission('order:view'), getPaymentByOrderController);
+router.get('/order/:orderId', requirePermission(Permission.VIEW_ORDERS), getPaymentByOrderController);
 
 // Refund payment (admin/restaurant owner only)
-router.post('/refund/:paymentIntentId', requirePermission('order:update_status'), refundPaymentController);
+router.post('/refund/:paymentIntentId', requirePermission(Permission.UPDATE_ORDER_STATUS), refundPaymentController);
 
 export default router;
