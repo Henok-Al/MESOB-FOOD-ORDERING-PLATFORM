@@ -23,14 +23,15 @@ router.use('/:restaurantId/products', productRouter);
 
 router
     .route('/')
-    .get(getRestaurants)
-    .post(protect, requirePermission(Permission.CREATE_RESTAURANT), validateBody(createRestaurantSchema), createRestaurant);
+    .get(getAllRestaurants)
+    .post(requirePermission(Permission.CREATE_RESTAURANT), createRestaurant);
 
 router.post('/seed', seedRestaurants);
 
-// New routes for specific restaurant by ID and status update
-router.route('/admin/all')
-    .get(requirePermission(Permission.VIEW_RESTAURANTS), getAllRestaurants);
+// Admin-only route to get all restaurants (including inactive)
+router
+    .route('/admin/all')
+    .get(requirePermission(Permission.VIEW_RESTAURANT), getAllRestaurants);
 
 router.route('/:id')
     .get(getRestaurantById)

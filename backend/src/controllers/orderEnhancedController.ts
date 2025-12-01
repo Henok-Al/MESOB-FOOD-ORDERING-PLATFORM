@@ -105,16 +105,17 @@ export const getOrderTracking = async (req: Request, res: Response): Promise<voi
     try {
         const order = await Order.findById(req.params.id)
             .populate('restaurant', 'name imageUrl phone address')
-            .populate('user', 'firstName lastName phone');
+            .populate('user'); // Populate user without specific fields for now
 
         if (!order) {
             res.status(404).json({ status: 'fail', message: 'Order not found' });
             return;
         }
 
-        // Check authorization
+        // Check if user owns this order or is admin
+        const userId = (order.user as any)._id || order.user; // Handle cases where user might be populated or just an ID
         if (
-            order.user._id.toString() !== req.user!._id.toString() &&
+            userId.toString() !== req.user!._id.toString() &&
             req.user!.role !== 'admin'
         ) {
             res.status(403).json({ status: 'fail', message: 'Not authorized' });
@@ -210,16 +211,18 @@ export const updateOrderStatusEnhanced = async (req: Request, res: Response): Pr
             },
         };
 
-        const notificationData = notificationMap[status];
-        if (notificationData) {
-            await createNotification(
-                order.user.toString(),
-                notificationData.type,
-                notificationData.title,
-                notificationData.message,
-                { relatedOrder: order._id.toString() }
-            );
+        const notificationData = notificationMap[status as OrderStatus];
+        if (!notificationData) {
+            // If status not in map, skip notification
+            return;
         }
+        await createNotification(
+            order.user.toString(),
+            notificationData.type,
+            notificationData.title,
+            notificationData.message,
+            { relatedOrder: order._id.toString() }
+        );
 
         // Emit socket event
         const io = req.app.get('io');
