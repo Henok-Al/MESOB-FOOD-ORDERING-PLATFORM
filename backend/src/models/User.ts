@@ -54,8 +54,15 @@ const userSchema = new Schema<IUser>({
     phone: {
         type: String,
         trim: true,
+        sparse: true,
         unique: true,
-        sparse: true, // Allows multiple null values
+        validate: {
+            validator: function(v: string) {
+                // If phone is provided, it should not be empty string
+                return v === undefined || v === null || v.length === 0 || /^[0-9]+$/.test(v);
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
     },
     password: {
         type: String,

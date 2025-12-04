@@ -45,6 +45,7 @@ const paymentSchema = new Schema<IPayment>(
             type: String,
             required: true,
             unique: true,
+            index: true,
         },
         paymentMethod: {
             type: String,
@@ -62,7 +63,6 @@ const paymentSchema = new Schema<IPayment>(
 // Index for faster queries
 paymentSchema.index({ user: 1, createdAt: -1 });
 paymentSchema.index({ order: 1 });
-paymentSchema.index({ stripePaymentIntentId: 1 });
 
 const Payment = mongoose.model<IPayment>('Payment', paymentSchema);
 

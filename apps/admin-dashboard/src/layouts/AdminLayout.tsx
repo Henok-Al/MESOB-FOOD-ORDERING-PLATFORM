@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, Users, Store, ShoppingBag, LogOut, Menu } from 'lucide-react';
 import clsx from 'clsx';
+import { UserRole } from '@food-ordering/constants';
 
 const AdminLayout = () => {
     const { user, logout } = useAuth();
@@ -13,12 +14,20 @@ const AdminLayout = () => {
         navigate('/login');
     };
 
-    const navigation = [
+    const adminNavigation = [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
         { name: 'Users', href: '/users', icon: Users },
         { name: 'Restaurants', href: '/restaurants', icon: Store },
         { name: 'Orders', href: '/orders', icon: ShoppingBag },
     ];
+
+    const restaurantNavigation = [
+        { name: 'My Menu', href: '/restaurant/menu', icon: Menu },
+        { name: 'My Orders', href: '/restaurant/orders', icon: ShoppingBag },
+        { name: 'Analytics', href: '/restaurant/analytics', icon: LayoutDashboard },
+    ];
+
+    const navigation = user?.role === UserRole.RESTAURANT_OWNER ? restaurantNavigation : adminNavigation;
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
@@ -61,6 +70,9 @@ const AdminLayout = () => {
                         <div className="ml-3">
                             <p className="text-sm font-medium text-white">
                                 {user?.firstName} {user?.lastName}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                                {user?.role === UserRole.ADMIN ? 'Administrator' : 'Restaurant Owner'}
                             </p>
                             <button
                                 onClick={handleLogout}

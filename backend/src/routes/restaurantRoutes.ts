@@ -6,7 +6,8 @@ import {
     updateRestaurant,
     deleteRestaurant,
     seedRestaurants,
-    updateRestaurantStatus
+    updateRestaurantStatus,
+    getMyRestaurant
 } from '../controllers/restaurantController';
 import { protect, requirePermission } from '../middleware/auth';
 import { Permission } from '../config/permissions';
@@ -27,6 +28,9 @@ router
     .post(requirePermission(Permission.CREATE_RESTAURANT), createRestaurant);
 
 router.post('/seed', seedRestaurants);
+
+// Get current user's restaurant
+router.get('/me', requirePermission(Permission.VIEW_RESTAURANT), getMyRestaurant);
 
 // Admin-only route to get all restaurants (including inactive)
 router

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
-// import { useSelector } from 'react-redux';
-// import { type RootState } from '../store';
-import api from '../services/api';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Switch } from '../components/ui/switch';
+import ImageUpload from '../../components/ImageUpload';
+import api from '../../services/api';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Switch } from '../../components/ui/switch';
 import {
     Table,
     TableBody,
@@ -14,22 +13,22 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '../components/ui/table';
+} from '../../components/ui/table';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from '../components/ui/dialog';
+} from '../../components/ui/dialog';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+} from '../../components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 
 interface Product {
     _id: string;
@@ -42,7 +41,6 @@ interface Product {
 }
 
 const MenuPage: React.FC = () => {
-    // const { user } = useSelector((state: RootState) => state.auth);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [open, setOpen] = useState(false);
@@ -62,9 +60,9 @@ const MenuPage: React.FC = () => {
     // Fetch Products
     const fetchProducts = async () => {
         try {
-            const restResponse = await api.get('/restaurants');
-            if (restResponse.data.data.restaurants.length > 0) {
-                const restaurantId = restResponse.data.data.restaurants[0]._id;
+            const restResponse = await api.get('/restaurants/me');
+            if (restResponse.data.data.restaurant) {
+                const restaurantId = restResponse.data.data.restaurant._id;
                 const prodResponse = await api.get(`/restaurants/${restaurantId}/products`);
                 setProducts(prodResponse.data.data.products);
             }
@@ -112,8 +110,8 @@ const MenuPage: React.FC = () => {
 
     const handleSubmit = async () => {
         try {
-            const restResponse = await api.get('/restaurants');
-            const restaurantId = restResponse.data.data.restaurants[0]._id;
+            const restResponse = await api.get('/restaurants/me');
+            const restaurantId = restResponse.data.data.restaurant._id;
 
             const payload = {
                 ...formData,
@@ -122,8 +120,7 @@ const MenuPage: React.FC = () => {
             };
 
             if (editMode && selectedProduct) {
-                // Update logic here
-                alert('Update feature coming soon');
+                await api.patch(`/products/${selectedProduct}`, payload);
             } else {
                 await api.post('/products', payload);
             }
@@ -201,7 +198,21 @@ const MenuPage: React.FC = () => {
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="text-destructive">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-destructive"
+                                                onClick={async () => {
+                                                    if (window.confirm('Are you sure you want to delete this product?')) {
+                                                        try {
+                                                            await api.delete(`/products/${product._id}`);
+                                                            fetchProducts();
+                                                        } catch (error) {
+                                                            console.error('Failed to delete product:', error);
+                                                        }
+                                                    }
+                                                }}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
@@ -265,11 +276,10 @@ const MenuPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="image">Image URL</Label>
-                            <Input
-                                id="image"
+                            <Label htmlFor="image">Product Image</Label>
+                            <ImageUpload
                                 value={formData.image}
-                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                onChange={(url) => setFormData({ ...formData, image: url })}
                             />
                         </div>
                         <div className="flex items-center space-x-2">

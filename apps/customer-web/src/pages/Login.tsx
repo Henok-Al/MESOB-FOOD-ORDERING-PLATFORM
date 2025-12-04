@@ -46,10 +46,15 @@ const Login: React.FC = () => {
             dispatch(loginStart());
             try {
                 const response = await api.post('/auth/login', values);
-                dispatch(loginSuccess(response.data.data));
+                dispatch(loginSuccess({
+                    user: response.data.data,
+                    token: response.data.token,
+                }));
                 navigate('/');
             } catch (err: any) {
-                dispatch(loginFailure(err.response?.data?.message || 'Login failed'));
+                console.error('Login error:', err);
+                const errorMessage = err.response?.data?.message || err.message || 'Login failed';
+                dispatch(loginFailure(errorMessage));
             }
         },
     });

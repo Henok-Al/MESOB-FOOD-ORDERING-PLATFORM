@@ -229,3 +229,25 @@ export const updateRestaurantStatus = async (req: Request, res: Response): Promi
         res.status(400).json({ status: 'fail', message: error.message });
     }
 };
+
+// @desc    Get current user's restaurant
+// @route   GET /api/restaurants/me
+// @access  Private (Restaurant Owner)
+export const getMyRestaurant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = (req as any).user._id;
+        const restaurant = await Restaurant.findOne({ owner: userId });
+
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found for this user' });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { restaurant },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};

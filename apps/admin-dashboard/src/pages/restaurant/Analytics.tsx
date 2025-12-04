@@ -4,8 +4,8 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Legend
 } from 'recharts';
-import api from '../services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import api from '../../services/api';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 
 interface AnalyticsData {
     overview: {
@@ -43,8 +43,8 @@ const Analytics = () => {
 
     const fetchRestaurantId = async () => {
         try {
-            const response = await api.get('/restaurants');
-            const id = response.data.data.restaurants[0]?._id;
+            const response = await api.get('/restaurants/me');
+            const id = response.data.data.restaurant?._id;
             if (id) setRestaurantId(id);
         } catch (error) {
             console.error('Failed to fetch restaurant:', error);

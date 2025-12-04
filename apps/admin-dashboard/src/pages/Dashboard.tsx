@@ -5,21 +5,27 @@ import {
     BarChart, Bar, PieChart, Pie, Cell, Legend
 } from 'recharts';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { usePermission } from '../hooks/usePermission';
 
 interface DashboardData {
     overview: {
-        totalUsers: number;
-        totalRestaurants: number;
+        totalUsers?: number;
+        totalRestaurants?: number;
         totalOrders: number;
         totalRevenue: number;
         averageOrderValue: number;
+        restaurantName?: string;
     };
     ordersByStatus: Array<{ _id: string; count: number }>;
     dailyRevenue: Array<{ _id: string; revenue: number; orders: number }>;
-    topRestaurants: Array<{ name: string; revenue: number; orders: number }>;
+    topRestaurants?: Array<{ name: string; revenue: number; orders: number }>;
+    popularItems?: Array<{ _id: string; totalOrdered: number; revenue: number }>;
 }
 
 const Dashboard = () => {
+    const { user } = useAuth();
+    const { isAdmin } = usePermission();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
@@ -35,8 +41,12 @@ const Dashboard = () => {
             if (dateRange.startDate) params.append('startDate', dateRange.startDate);
             if (dateRange.endDate) params.append('endDate', dateRange.endDate);
 
+            const endpoint = isAdmin
+                ? `/api/analytics/admin/dashboard?${params}`
+                : `/api/analytics/restaurant/dashboard?${params}`;
+
             const response = await axios.get(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/analytics/admin/dashboard?${params}`,
+                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${endpoint}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setData(response.data.data);
@@ -63,19 +73,32 @@ const Dashboard = () => {
         );
     }
 
-    const stats = [
+    const stats = isAdmin ? [
         {
             name: 'Total Users',
-            value: data.overview.totalUsers.toLocaleString(),
+            value: data.overview.totalUsers?.toLocaleString() || '0',
             icon: Users,
             color: 'bg-blue-500'
         },
         {
             name: 'Total Restaurants',
-            value: data.overview.totalRestaurants.toLocaleString(),
+            value: data.overview.totalRestaurants?.toLocaleString() || '0',
             icon: Store,
             color: 'bg-green-500'
         },
+        {
+            name: 'Total Orders',
+            value: data.overview.totalOrders.toLocaleString(),
+            icon: ShoppingBag,
+            color: 'bg-purple-500'
+        },
+        {
+            name: 'Total Revenue',
+            value: `$${data.overview.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            icon: DollarSign,
+            color: 'bg-yellow-500'
+        },
+    ] : [
         {
             name: 'Total Orders',
             value: data.overview.totalOrders.toLocaleString(),
@@ -106,7 +129,14 @@ const Dashboard = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard Overview</h1>
+                <div>
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        {isAdmin ? 'Dashboard Overview' : `${data.overview.restaurantName || 'Restaurant'} Dashboard`}
+                    </h1>
+                    {!isAdmin && data.overview.restaurantName && (
+                        <p className="text-sm text-gray-500 mt-1">Restaurant Owner View</p>
+                    )}
+                </div>
                 <div className="flex gap-2">
                     <input
                         type="date"
@@ -207,21 +237,23 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Top Restaurants */}
-            <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Top Restaurants by Revenue</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={data.topRestaurants}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="revenue" fill="#3B82F6" name="Revenue ($)" />
-                        <Bar dataKey="orders" fill="#10B981" name="Orders" />
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
+            {/* Top Restaurants - Admin Only */}
+            {isAdmin && data.topRestaurants && (
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Top Restaurants by Revenue</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={data.topRestaurants}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="revenue" fill="#3B82F6" name="Revenue ($)" />
+                            <Bar dataKey="orders" fill="#10B981" name="Orders" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     );
 };

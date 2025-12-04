@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import OrderTracking from './pages/OrderTracking';
 import Notifications from './pages/Notifications';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const queryClient = new QueryClient();
 
@@ -28,11 +29,46 @@ function App() {
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
-                            <Route path="/checkout" element={<Checkout />} />
-                            <Route path="/orders" element={<Orders />} />
-                            <Route path="/orders/:orderId/track" element={<OrderTracking />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/notifications" element={<Notifications />} />
+                            <Route
+                                path="/checkout"
+                                element={(
+                                    <ProtectedRoute>
+                                        <Checkout />
+                                    </ProtectedRoute>
+                                )}
+                            />
+                            <Route
+                                path="/orders"
+                                element={(
+                                    <ProtectedRoute>
+                                        <Orders />
+                                    </ProtectedRoute>
+                                )}
+                            />
+                            <Route
+                                path="/orders/:orderId/track"
+                                element={(
+                                    <ProtectedRoute>
+                                        <OrderTracking />
+                                    </ProtectedRoute>
+                                )}
+                            />
+                            <Route
+                                path="/profile"
+                                element={(
+                                    <ProtectedRoute>
+                                        <Profile />
+                                    </ProtectedRoute>
+                                )}
+                            />
+                            <Route
+                                path="/notifications"
+                                element={(
+                                    <ProtectedRoute>
+                                        <Notifications />
+                                    </ProtectedRoute>
+                                )}
+                            />
                         </Routes>
                     </BrowserRouter>
                 </ThemeProvider>

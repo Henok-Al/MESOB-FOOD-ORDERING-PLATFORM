@@ -14,6 +14,7 @@ import profileRoutes from './routes/profileRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 import { seedProducts } from './controllers/productController';
 
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Nest products under restaurants
 // Note: In a real app, we'd mount this in restaurantRoutes.js, but for simplicity:

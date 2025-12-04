@@ -56,8 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const response = await axios.post('/api/auth/login', credentials);
         const { token, user } = response.data;
 
-        if (user.role !== UserRole.ADMIN) {
-            throw new Error('Access denied. Admin privileges required.');
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.RESTAURANT_OWNER) {
+            throw new Error('Access denied. Admin or Restaurant Owner privileges required.');
         }
 
         localStorage.setItem('token', token);

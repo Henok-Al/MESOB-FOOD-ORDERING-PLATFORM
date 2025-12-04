@@ -16,7 +16,7 @@ export const registerSchema = z.object({
         .toLowerCase()
         .trim(),
     phone: z.string()
-        .regex(/^\+?[1-9]\d{9,14}$/, 'Please provide a valid phone number')
+        .regex(/^([0-9]{10,}|)$/, 'Phone number must be at least 10 digits or empty')
         .optional(),
     password: z.string()
         .min(8, 'Password must be at least 8 characters')
@@ -25,7 +25,7 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, 'Password must contain at least one number')
         .regex(/[@$!%*?&#]/, 'Password must contain at least one special character'),
     role: z.enum(['customer', 'restaurant_owner', 'admin', 'driver']).optional(),
-});
+}).passthrough(); // Allow additional fields like confirmPassword that are validated on frontend
 
 export const loginSchema = z.object({
     email: z.string()
@@ -48,7 +48,7 @@ export const updateUserSchema = z.object({
         .trim()
         .optional(),
     phone: z.string()
-        .regex(/^\+?[1-9]\d{9,14}$/, 'Please provide a valid phone number')
+        .regex(/^\+?[0-9]\d{9,14}$/, 'Please provide a valid phone number')
         .optional(),
 });
 

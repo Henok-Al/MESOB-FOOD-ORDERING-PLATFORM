@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { MoreHorizontal, Loader2, Filter } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
-import api from '../services/api';
-import { Button } from '../components/ui/button';
+import api from '../../services/api';
+import { Button } from '../../components/ui/button';
 import {
     Table,
     TableBody,
@@ -10,7 +10,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '../components/ui/table';
+} from '../../components/ui/table';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,15 +18,15 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '../components/ui/dropdown-menu';
+} from '../../components/ui/dropdown-menu';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+} from '../../components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 
 interface Order {
     _id: string;
@@ -55,8 +55,8 @@ const OrdersPage: React.FC = () => {
 
     const fetchOrders = async () => {
         try {
-            const restResponse = await api.get('/restaurants');
-            const restaurantId = restResponse.data.data.restaurants[0]._id;
+            const restResponse = await api.get('/restaurants/me');
+            const restaurantId = restResponse.data.data.restaurant._id;
 
             const response = await api.get(`/orders/restaurant/${restaurantId}`);
             setOrders(response.data.data.orders);
@@ -85,8 +85,8 @@ const OrdersPage: React.FC = () => {
             console.log('Socket connected');
             // Join restaurant room
             try {
-                const restResponse = await api.get('/restaurants');
-                const restaurantId = restResponse.data.data.restaurants[0]._id;
+                const restResponse = await api.get('/restaurants/me');
+                const restaurantId = restResponse.data.data.restaurant._id;
                 socketInstance.emit('joinRestaurant', restaurantId);
             } catch (error) {
                 console.error('Failed to join restaurant room:', error);

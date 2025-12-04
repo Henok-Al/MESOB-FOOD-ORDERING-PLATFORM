@@ -64,6 +64,16 @@ const Register: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
+                // Log the values being sent for debugging
+                console.log('Sending registration data:', {
+                    firstName: values.firstName,
+                    lastName: values.lastName,
+                    email: values.email,
+                    phone: values.phone || undefined,
+                    password: values.password,
+                    role: 'customer',
+                });
+                
                 await api.post('/auth/register', {
                     firstName: values.firstName,
                     lastName: values.lastName,
@@ -74,7 +84,18 @@ const Register: React.FC = () => {
                 });
                 navigate('/login');
             } catch (err: any) {
-                setError(err.response?.data?.message || 'Registration failed');
+                // Handle validation errors from backend
+                console.error('Registration error:', err);
+                if (err.response?.data?.errors) {
+                    const backendErrors = err.response.data.errors;
+                    let errorMessage = 'Validation failed:';
+                    backendErrors.forEach((err: any) => {
+                        errorMessage += ` ${err.field}: ${err.message};`;
+                    });
+                    setError(errorMessage);
+                } else {
+                    setError(err.response?.data?.message || 'Registration failed');
+                }
             } finally {
                 setLoading(false);
             }

@@ -253,6 +253,119 @@ export const getRestaurantAnalytics = async (req: Request, res: Response): Promi
     }
 };
 
+// @desc    Get restaurant owner dashboard metrics
+// @route   GET /api/analytics/restaurant/dashboard
+// @access  Private (Restaurant Owner)
+export const getRestaurantOwnerDashboard = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.user?._id;
+        const { startDate, endDate } = req.query;
+
+        // Find restaurant owned by this user
+        const restaurant = await Restaurant.findOne({ owner: userId });
+
+        if (!restaurant) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'No restaurant found for this user. Please contact support to link your account to a restaurant.',
+            });
+            return;
+        }
+
+        const dateFilter: any = { restaurant: restaurant._id };
+        if (startDate && endDate) {
+            dateFilter.createdAt = {
+                $gte: new Date(startDate as string),
+                $lte: new Date(endDate as string),
+            };
+        }
+
+        // Total orders and revenue
+        const orderStats = await Order.aggregate([
+            { $match: dateFilter },
+            {
+                $group: {
+                    _id: null,
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: {
+                        $sum: {
+                            $cond: [{ $eq: ['$status', OrderStatus.DELIVERED] }, '$totalAmount', 0],
+                        },
+                    },
+                    averageOrderValue: { $avg: '$totalAmount' },
+                },
+            },
+        ]);
+
+        const stats = orderStats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 };
+
+        // Orders by status
+        const ordersByStatus = await Order.aggregate([
+            { $match: { restaurant: restaurant._id } },
+            {
+                $group: {
+                    _id: '$status',
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        // Daily revenue trend (last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const dailyRevenue = await Order.aggregate([
+            {
+                $match: {
+                    restaurant: restaurant._id,
+                    status: OrderStatus.DELIVERED,
+                    createdAt: { $gte: sevenDaysAgo },
+                },
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                    revenue: { $sum: '$totalAmount' },
+                    orders: { $sum: 1 },
+                },
+            },
+            { $sort: { _id: 1 } },
+        ]);
+
+        // Popular menu items
+        const popularItems = await Order.aggregate([
+            { $match: { restaurant: restaurant._id, status: OrderStatus.DELIVERED } },
+            { $unwind: '$items' },
+            {
+                $group: {
+                    _id: '$items.name',
+                    totalOrdered: { $sum: '$items.quantity' },
+                    revenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } },
+                },
+            },
+            { $sort: { totalOrdered: -1 } },
+            { $limit: 5 },
+        ]);
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                overview: {
+                    totalOrders: stats.totalOrders,
+                    totalRevenue: stats.totalRevenue,
+                    averageOrderValue: stats.averageOrderValue,
+                    restaurantName: restaurant.name,
+                },
+                ordersByStatus,
+                dailyRevenue,
+                popularItems,
+            },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
 // @desc    Get revenue report
 // @route   GET /api/analytics/revenue
 // @access  Private (Admin)
