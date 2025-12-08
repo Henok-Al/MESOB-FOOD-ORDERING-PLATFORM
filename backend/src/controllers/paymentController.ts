@@ -79,6 +79,7 @@ export const confirmPaymentController = async (req: Request, res: Response): Pro
         const order = await Order.create({
             ...orderData,
             user: userId,
+            paymentStatus: 'paid',
             payment: {
                 paymentIntentId: paymentIntent.id,
                 paymentStatus: 'succeeded',

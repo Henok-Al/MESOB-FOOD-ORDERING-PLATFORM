@@ -70,13 +70,45 @@ const seedAll = async () => {
         const restaurant = await Restaurant.create({
             name: 'Mesob Ethiopian Cuisine',
             description: 'Authentic Ethiopian food with traditional recipes',
+            cuisine: 'Ethiopian',
             address: '123 Bole Road, Addis Ababa',
             rating: 4.8,
             imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1',
             deliveryTime: '30-45 min',
             minOrder: 50,
             isActive: true,
+            status: 'approved',
             owner: owner._id,
+            // New fields
+            phone: '+251911234567',
+            email: 'info@mesob.com',
+            website: 'https://mesob.com',
+            tags: ['Ethiopian', 'Vegetarian Friendly', 'Halal', 'Traditional'],
+            isFeatured: true,
+            viewCount: 0,
+            hours: [
+                { day: 'monday', openTime: '10:00', closeTime: '22:00', isClosed: false },
+                { day: 'tuesday', openTime: '10:00', closeTime: '22:00', isClosed: false },
+                { day: 'wednesday', openTime: '10:00', closeTime: '22:00', isClosed: false },
+                { day: 'thursday', openTime: '10:00', closeTime: '22:00', isClosed: false },
+                { day: 'friday', openTime: '10:00', closeTime: '23:00', isClosed: false },
+                { day: 'saturday', openTime: '10:00', closeTime: '23:00', isClosed: false },
+                { day: 'sunday', openTime: '11:00', closeTime: '21:00', isClosed: false },
+            ],
+            location: {
+                type: 'Point',
+                coordinates: [38.7469, 9.0320], // Addis Ababa coordinates [longitude, latitude]
+            },
+            socialMedia: {
+                facebook: 'https://facebook.com/mesob',
+                instagram: 'https://instagram.com/mesob',
+                twitter: 'https://twitter.com/mesob',
+            },
+            gallery: [
+                'https://images.unsplash.com/photo-1555939594-58d7cb561ad1',
+                'https://images.unsplash.com/photo-1529042410759-befb1204b468',
+                'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
+            ],
         });
         console.log(`✅ Restaurant created: ${restaurant.name}`);
 

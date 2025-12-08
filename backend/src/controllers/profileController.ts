@@ -21,10 +21,18 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 // @access  Private
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { firstName, lastName, phone } = req.body;
+        const updatableFields = ['firstName', 'lastName', 'phone', 'profileImage'] as const;
+        const updateData: Record<string, unknown> = {};
+
+        updatableFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        });
+
         const user = await User.findByIdAndUpdate(
             req.user!._id,
-            { firstName, lastName, phone },
+            updateData,
             { new: true, runValidators: true }
         );
 

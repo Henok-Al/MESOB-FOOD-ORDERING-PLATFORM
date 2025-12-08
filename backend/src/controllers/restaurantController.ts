@@ -251,3 +251,190 @@ export const getMyRestaurant = async (req: Request, res: Response): Promise<void
         res.status(400).json({ status: 'fail', message: error.message });
     }
 };
+
+// @desc    Get featured restaurants
+// @route   GET /api/restaurants/featured
+// @access  Public
+export const getFeaturedRestaurants = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const limit = parseInt(req.query.limit as string) || 6;
+
+        const restaurants = await Restaurant.find({
+            isFeatured: true,
+            isActive: true,
+            status: 'approved'
+        })
+            .sort({ rating: -1, viewCount: -1 })
+            .limit(limit);
+
+        res.status(200).json({
+            status: 'success',
+            results: restaurants.length,
+            data: { restaurants },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Increment restaurant view count
+// @route   POST /api/restaurants/:id/view
+// @access  Public
+export const incrementViewCount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurant = await Restaurant.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { viewCount: 1 } },
+            { new: true }
+        );
+
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { viewCount: restaurant.viewCount },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Update restaurant business hours
+// @route   PATCH /api/restaurants/:id/hours
+// @access  Private (Owner/Admin)
+export const updateRestaurantHours = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { hours } = req.body;
+
+        const restaurant = await Restaurant.findByIdAndUpdate(
+            req.params.id,
+            { hours },
+            { new: true, runValidators: true }
+        );
+
+        if (!restaurant) {
+            res.status(404).json({ status: 'fail', message: 'Restaurant not found' });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { restaurant },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Get restaurant analytics
+// @route   GET /api/restaurants/:id/analytics
+// @access  Private (Owner/Admin)
+export const getRestaurantAnalytics = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const restaurantId = req.params.id;
+
+        // Import Order model dynamically to avoid circular dependency
+        const Order = require('../models/Order').default;
+        const Review = require('../models/Review').default;
+
+        // Get all orders for this restaurant
+        const orders = await Order.find({
+            restaurant: restaurantId,
+            status: { $in: ['delivered', 'completed'] }
+        });
+
+        // Calculate basic stats
+        const totalOrders = orders.length;
+        const totalRevenue = orders.reduce((sum: number, order: any) => sum + order.totalAmount, 0);
+        const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+        // Get all orders including pending/cancelled for completion rate
+        const allOrders = await Order.find({ restaurant: restaurantId });
+        const completionRate = allOrders.length > 0
+            ? (totalOrders / allOrders.length) * 100
+            : 0;
+
+        // Get popular items
+        const itemStats: any = {};
+        orders.forEach((order: any) => {
+            order.items.forEach((item: any) => {
+                const productId = item.product.toString();
+                if (!itemStats[productId]) {
+                    itemStats[productId] = {
+                        productId,
+                        name: item.name,
+                        orderCount: 0,
+                        revenue: 0,
+                    };
+                }
+                itemStats[productId].orderCount += item.quantity;
+                itemStats[productId].revenue += item.price * item.quantity;
+            });
+        });
+
+        const popularItems = Object.values(itemStats)
+            .sort((a: any, b: any) => b.orderCount - a.orderCount)
+            .slice(0, 10);
+
+        // Get revenue by period (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const recentOrders = orders.filter((order: any) =>
+            new Date(order.createdAt) >= thirtyDaysAgo
+        );
+
+        const revenueByDate: any = {};
+        recentOrders.forEach((order: any) => {
+            const date = new Date(order.createdAt).toISOString().split('T')[0];
+            if (!revenueByDate[date]) {
+                revenueByDate[date] = { date, revenue: 0, orders: 0 };
+            }
+            revenueByDate[date].revenue += order.totalAmount;
+            revenueByDate[date].orders += 1;
+        });
+
+        const revenueByPeriod = Object.values(revenueByDate).sort((a: any, b: any) =>
+            a.date.localeCompare(b.date)
+        );
+
+        // Get review stats
+        const reviews = await Review.find({ restaurant: restaurantId });
+        const totalReviews = reviews.length;
+        const averageRating = totalReviews > 0
+            ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / totalReviews
+            : 0;
+
+        // Rating distribution
+        const ratingDist: any = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        reviews.forEach((review: any) => {
+            ratingDist[Math.floor(review.rating)] += 1;
+        });
+
+        const ratingDistribution = Object.entries(ratingDist).map(([rating, count]) => ({
+            rating: parseInt(rating),
+            count: count as number,
+        }));
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                restaurantId,
+                totalOrders,
+                totalRevenue,
+                averageOrderValue,
+                completionRate,
+                popularItems,
+                revenueByPeriod,
+                averageRating,
+                totalReviews,
+                ratingDistribution,
+            },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};

@@ -19,11 +19,18 @@ export interface IOrder extends Document {
     user: mongoose.Schema.Types.ObjectId;
     restaurant: mongoose.Schema.Types.ObjectId;
     items: IOrderItem[];
+    subtotal?: number;
+    deliveryFee?: number;
+    discount?: number;
     totalAmount: number;
     status: OrderStatus;
     statusHistory: IStatusHistory[];
     deliveryAddress: string;
     addressId?: mongoose.Schema.Types.ObjectId;
+    contactName?: string;
+    contactPhone?: string;
+    contactlessDelivery?: boolean;
+    promoCode?: string;
     paymentMethod: 'card' | 'cash';
     paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
     payment?: {
@@ -66,6 +73,18 @@ const orderSchema = new Schema<IOrder>({
             price: { type: Number, required: true },
         },
     ],
+    subtotal: {
+        type: Number,
+        default: 0,
+    },
+    deliveryFee: {
+        type: Number,
+        default: 0,
+    },
+    discount: {
+        type: Number,
+        default: 0,
+    },
     totalAmount: {
         type: Number,
         required: true,
@@ -99,6 +118,19 @@ const orderSchema = new Schema<IOrder>({
     },
     addressId: {
         type: mongoose.Schema.Types.ObjectId,
+    },
+    contactName: {
+        type: String,
+    },
+    contactPhone: {
+        type: String,
+    },
+    contactlessDelivery: {
+        type: Boolean,
+        default: false,
+    },
+    promoCode: {
+        type: String,
     },
     paymentMethod: {
         type: String,

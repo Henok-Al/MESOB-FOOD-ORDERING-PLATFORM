@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../components/ui/select';
-import { Search, Eye, Clock, MapPin, User, DollarSign } from 'lucide-react';
+import { Search, Eye, Clock, MapPin, User, DollarSign, Wallet } from 'lucide-react';
 
 interface Order {
     _id: string;
@@ -35,6 +35,8 @@ interface Order {
     }>;
     totalAmount: number;
     status: string;
+    paymentMethod: 'card' | 'cash';
+    paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
     deliveryAddress: string;
     createdAt: string;
     statusHistory?: Array<{
@@ -65,6 +67,21 @@ const Orders = () => {
         },
     });
 
+    const updatePaymentStatusMutation = useMutation({
+        mutationFn: async ({ orderId, paymentStatus }: { orderId: string; paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' }) => {
+            const token = localStorage.getItem('token');
+            await axios.patch(
+                `/api/orders/${orderId}/payment`,
+                { paymentStatus },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+            setSelectedOrder((prev) => (prev ? { ...prev, paymentStatus: 'paid' } : prev));
+        },
+    });
+
     const updateStatusMutation = useMutation({
         mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
             const token = localStorage.getItem('token');
@@ -89,6 +106,16 @@ const Orders = () => {
             case 'out_for_delivery': return 'bg-purple-100 text-purple-800';
             case 'delivered': return 'bg-green-100 text-green-800';
             case 'cancelled': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getPaymentStatusColor = (status: string) => {
+        switch (status) {
+            case 'paid': return 'bg-green-100 text-green-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'failed': return 'bg-red-100 text-red-800';
+            case 'refunded': return 'bg-blue-100 text-blue-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
@@ -153,6 +180,9 @@ const Orders = () => {
                                 Total
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Payment
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -180,6 +210,14 @@ const Orders = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     ${order.totalAmount.toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-medium text-gray-900">
+                                        {order.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Card'}
+                                    </div>
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPaymentStatusColor(order.paymentStatus)}`}>
+                                        {order.paymentStatus.toUpperCase()}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
@@ -256,12 +294,31 @@ const Orders = () => {
                                 <span className="text-lg">${selectedOrder.totalAmount.toFixed(2)}</span>
                             </div>
 
+                            {/* Payment Details */}
+                            <div className="border-b pb-4">
+                                <h3 className="font-semibold mb-2 flex items-center">
+                                    <Wallet className="h-4 w-4 mr-2" />
+                                    Payment Details
+                                </h3>
+                                <p className="text-sm capitalize"><strong>Method:</strong> {selectedOrder.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Card'}</p>
+                                <p className="text-sm"><strong>Status:</strong> {selectedOrder.paymentStatus.toUpperCase()}</p>
+                                {selectedOrder.paymentMethod === 'cash' && selectedOrder.paymentStatus !== 'paid' && (
+                                    <button
+                                        onClick={() => updatePaymentStatusMutation.mutate({ orderId: selectedOrder._id, paymentStatus: 'paid' })}
+                                        className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+                                        disabled={updatePaymentStatusMutation.isPending}
+                                    >
+                                        {updatePaymentStatusMutation.isPending ? 'Marking…' : 'Mark Cash as Received'}
+                                    </button>
+                                )}
+                            </div>
+
                             {/* Status Update */}
                             <div>
                                 <h3 className="font-semibold mb-2">Update Status</h3>
                                 <Select
                                     value={selectedOrder.status}
-                                    onValueChange={(status) => {
+                                    onValueChange={(status: string) => {
                                         updateStatusMutation.mutate({
                                             orderId: selectedOrder._id,
                                             status,

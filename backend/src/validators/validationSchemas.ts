@@ -129,13 +129,35 @@ export const createOrderSchema = z.object({
     ).min(1, 'Order must contain at least one item'),
     restaurant: z.string()
         .regex(/^[0-9a-fA-F]{24}$/, 'Invalid restaurant ID'),
+    subtotal: z.number()
+        .nonnegative('Subtotal must be positive')
+        .optional(),
+    deliveryFee: z.number()
+        .nonnegative('Delivery fee must be positive')
+        .optional(),
+    discount: z.number()
+        .nonnegative('Discount must be positive')
+        .optional(),
+    totalAmount: z.number()
+        .positive('Total amount must be positive'),
     deliveryAddress: z.string()
         .min(5, 'Delivery address must be at least 5 characters')
         .trim(),
     paymentMethod: z.enum(['cash', 'card', 'mobile_money'], {
         message: 'Invalid payment method'
     }),
-    notes: z.string()
+    contactName: z.string()
+        .min(1, 'Contact name is required')
+        .max(100, 'Contact name must be less than 100 characters')
+        .optional(),
+    contactPhone: z.string()
+        .regex(/^\+?[0-9]{7,15}$/, 'Provide a valid contact phone')
+        .optional(),
+    contactlessDelivery: z.boolean().optional(),
+    promoCode: z.string()
+        .max(50, 'Promo code must be less than 50 characters')
+        .optional(),
+    customerNotes: z.string()
         .max(200, 'Notes must be less than 200 characters')
         .trim()
         .optional(),

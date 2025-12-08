@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { OrderStatus } from '@food-ordering/constants';
 import Order from '../models/Order';
 import Product from '../models/Product';
 
@@ -7,20 +8,58 @@ import Product from '../models/Product';
 // @access  Private
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { restaurant, items, totalAmount, deliveryAddress, paymentMethod } = req.body;
+        const {
+            restaurant,
+            items,
+            subtotal,
+            deliveryFee,
+            discount,
+            totalAmount,
+            deliveryAddress,
+            paymentMethod,
+            contactName,
+            contactPhone,
+            contactlessDelivery,
+            promoCode,
+            customerNotes,
+        } = req.body;
 
         if (!items || items.length === 0) {
             res.status(400).json({ status: 'fail', message: 'No order items' });
             return;
         }
 
+        const computedSubtotal = typeof subtotal === 'number'
+            ? subtotal
+            : items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+        const computedDeliveryFee = typeof deliveryFee === 'number' ? deliveryFee : 0;
+        const computedDiscount = typeof discount === 'number' ? discount : 0;
+
+        const userId = (req as any).user._id;
         const order = await Order.create({
-            user: (req as any).user._id,
+            user: userId,
             restaurant,
             items,
+            subtotal: computedSubtotal,
+            deliveryFee: computedDeliveryFee,
+            discount: computedDiscount,
             totalAmount,
             deliveryAddress,
+            contactName,
+            contactPhone,
+            contactlessDelivery,
+            promoCode,
+            customerNotes,
             paymentMethod,
+            paymentStatus: paymentMethod === 'cash' ? 'pending' : 'paid',
+            statusHistory: [
+                {
+                    status: OrderStatus.PENDING,
+                    timestamp: new Date(),
+                    note: paymentMethod === 'cash' ? 'Awaiting cash payment' : 'Order placed',
+                    updatedBy: userId,
+                },
+            ],
         });
 
         res.status(201).json({
@@ -34,6 +73,53 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
             status: 'fail',
             message: error.message,
         });
+    }
+};
+
+// @desc    Update order payment status (e.g., COD collected)
+// @route   PATCH /api/orders/:id/payment
+// @access  Private (Restaurant Owner/Admin)
+export const updateOrderPaymentStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { paymentStatus } = req.body;
+
+        const allowedStatuses = ['pending', 'paid', 'failed', 'refunded'];
+        if (!paymentStatus || !allowedStatuses.includes(paymentStatus)) {
+            res.status(400).json({ status: 'fail', message: 'Invalid payment status' });
+            return;
+        }
+
+        const order = await Order.findById(id);
+        if (!order) {
+            res.status(404).json({ status: 'fail', message: 'Order not found' });
+            return;
+        }
+
+        order.paymentStatus = paymentStatus as any;
+        if (paymentStatus === 'paid' && order.paymentMethod === 'cash') {
+            order.payment = {
+                ...(order.payment || {}),
+                paymentMethod: 'cash',
+                paymentStatus: 'paid',
+                paidAmount: order.totalAmount,
+            };
+            order.statusHistory.push({
+                status: order.status,
+                timestamp: new Date(),
+                note: 'Cash payment collected',
+                updatedBy: (req as any).user._id,
+            });
+        }
+
+        await order.save();
+
+        res.status(200).json({
+            status: 'success',
+            data: { order },
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
     }
 };
 

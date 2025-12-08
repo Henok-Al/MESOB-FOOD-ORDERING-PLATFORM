@@ -4,6 +4,7 @@ import {
     getMyOrders,
     getOrderById,
     getAllOrders,
+    updateOrderPaymentStatus,
 } from '../controllers/orderController';
 import {
     cancelOrder,
@@ -32,6 +33,9 @@ router.route('/:id')
 
 router.route('/:id/status')
     .patch(requirePermission(Permission.MANAGE_ORDERS), updateOrderStatusEnhanced);
+
+router.route('/:id/payment')
+    .patch(requirePermission(Permission.MANAGE_ORDERS), updateOrderPaymentStatus);
 
 router.route('/:id/cancel')
     .patch(cancelOrder);

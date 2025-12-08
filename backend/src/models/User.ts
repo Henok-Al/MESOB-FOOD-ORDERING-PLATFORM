@@ -16,6 +16,7 @@ export interface IUser extends Document {
     lastName: string;
     email: string;
     phone?: string;
+    profileImage?: string;
     password?: string;
     role: UserRole;
     addresses: IAddress[];
@@ -63,6 +64,11 @@ const userSchema = new Schema<IUser>({
             },
             message: props => `${props.value} is not a valid phone number!`
         }
+    },
+    profileImage: {
+        type: String,
+        trim: true,
+        default: '',
     },
     password: {
         type: String,

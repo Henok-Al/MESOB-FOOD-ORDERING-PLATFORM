@@ -37,7 +37,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             const response = await axios.get('/api/auth/me');
-            setUser(response.data.data.user);
+            const userData = response.data.data;
+            setUser({
+                ...userData,
+                id: userData._id || userData.id,
+            });
         } catch (error) {
             console.error('Auth check failed:', error);
             localStorage.removeItem('token');
@@ -54,7 +58,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (credentials: any) => {
         const response = await axios.post('/api/auth/login', credentials);
-        const { token, user } = response.data;
+        const { token, data } = response.data;
+        
+        const user = {
+            ...data,
+            id: data._id || data.id,
+        };
 
         if (user.role !== UserRole.ADMIN && user.role !== UserRole.RESTAURANT_OWNER) {
             throw new Error('Access denied. Admin or Restaurant Owner privileges required.');
