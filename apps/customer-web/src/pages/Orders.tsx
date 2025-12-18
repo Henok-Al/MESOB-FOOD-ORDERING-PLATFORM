@@ -71,7 +71,7 @@ const Orders: React.FC = () => {
 
     const handleReorder = async (orderId: string) => {
         try {
-            const response = await api.post(`/orders/${orderId}/reorder`);
+            await api.post(`/orders/${orderId}/reorder`);
             setSuccess('Order placed successfully!');
             navigate('/orders');
             fetchOrders();

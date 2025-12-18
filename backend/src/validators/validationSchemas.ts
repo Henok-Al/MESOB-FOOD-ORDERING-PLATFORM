@@ -105,12 +105,25 @@ export const createProductSchema = z.object({
         .url('Please provide a valid URL')
         .optional(),
     isAvailable: z.boolean().optional(),
+    isVeg: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
     restaurant: z.string()
         .regex(/^[0-9a-fA-F]{24}$/, 'Invalid restaurant ID')
         .optional(), // Optional because it might come from auth
 });
 
 export const updateProductSchema = createProductSchema.partial();
+
+// ==================== Category Validation Schemas ====================
+
+export const createCategorySchema = z.object({
+    name: z.string()
+        .min(1, 'Category name is required')
+        .max(50, 'Category name must be less than 50 characters')
+        .trim(),
+});
+
+export const updateCategorySchema = createCategorySchema.partial();
 
 // ==================== Order Validation Schemas ====================
 
@@ -178,5 +191,7 @@ export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
 export type UpdateRestaurantInput = z.infer<typeof updateRestaurantSchema>;
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

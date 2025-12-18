@@ -193,3 +193,54 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
         });
     }
 };
+
+export const bulkUpdateProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { restaurantId } = req.params as { restaurantId: string };
+        const { category, productIds, pricePercent, priceSet, isAvailable, isVeg, isFeatured } = req.body as {
+            category?: string;
+            productIds?: string[];
+            pricePercent?: number;
+            priceSet?: number;
+            isAvailable?: boolean;
+            isVeg?: boolean;
+            isFeatured?: boolean;
+        };
+
+        const filter: any = { restaurant: restaurantId };
+        if (category) filter.category = category;
+        if (Array.isArray(productIds) && productIds.length > 0) filter._id = { $in: productIds };
+
+        const update: any = {};
+        if (typeof isAvailable === 'boolean') update.isAvailable = isAvailable;
+        if (typeof isVeg === 'boolean') update.isVeg = isVeg;
+        if (typeof isFeatured === 'boolean') update.isFeatured = isFeatured;
+
+        let modifiedCount = 0;
+
+        if (typeof priceSet === 'number') {
+            update.price = priceSet;
+            const result = await Product.updateMany(filter, { $set: update });
+            modifiedCount = result.modifiedCount || 0;
+        } else if (typeof pricePercent === 'number' && pricePercent !== 0) {
+            const products = await Product.find(filter);
+            for (const p of products) {
+                const newPrice = Math.max(0, p.price + (p.price * pricePercent) / 100);
+                const payload = { ...update, price: newPrice };
+                await Product.updateOne({ _id: p._id }, { $set: payload });
+                modifiedCount += 1;
+            }
+        } else {
+            if (Object.keys(update).length === 0) {
+                res.status(400).json({ status: 'fail', message: 'No updates provided' });
+                return;
+            }
+            const result = await Product.updateMany(filter, { $set: update });
+            modifiedCount = result.modifiedCount || 0;
+        }
+
+        res.status(200).json({ status: 'success', data: { modifiedCount } });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};

@@ -15,10 +15,7 @@ import {
     CardContent,
     CardMedia,
     Avatar,
-    Rating,
     Divider,
-    useTheme,
-    alpha,
     Fade,
     Slide,
     keyframes,
@@ -33,19 +30,9 @@ import {
     Fastfood,
     EmojiEvents,
     Bolt,
-    LocalShipping,
-    AccessTime,
-    ThumbUp,
-    TrendingUp,
-    CheckCircle,
     ArrowForward,
-    LocationOn,
-    Schedule,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { logout } from '../store/slices/authSlice';
 import api from '../services/api';
 import RestaurantCard from '../components/common/RestaurantCard';
 import { Restaurant } from '@food-ordering/types';
@@ -80,14 +67,11 @@ const pulse = keyframes`
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [cuisineFilter, setCuisineFilter] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const theme = useTheme();
 
     useEffect(() => {
         const fetchRestaurants = async () => {
@@ -103,11 +87,6 @@ const Home: React.FC = () => {
 
         fetchRestaurants();
     }, []);
-
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate('/login');
-    };
 
     const heroStats = [
         { label: 'Partner Restaurants', value: '500+', detail: 'Across Addis & beyond' },
@@ -169,7 +148,6 @@ const Home: React.FC = () => {
     }, [restaurants, searchTerm, cuisineFilter, selectedCategory]);
 
     const featuredRestaurants = filteredRestaurants.slice(0, 4);
-    const trendingRestaurants = filteredRestaurants.slice(4, 8);
 
     return (
         <Box sx={{
@@ -202,85 +180,6 @@ const Home: React.FC = () => {
                 }
             }
         }}>
-            {/* Navigation */}
-            <Box sx={{
-                position: 'relative',
-                zIndex: 10,
-                py: 2,
-                px: { xs: 2, md: 4 }
-            }}>
-                <Container maxWidth="xl">
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        backdropFilter: 'blur(10px)',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        borderRadius: 3,
-                        px: 3,
-                        py: 2,
-                        border: '1px solid rgba(255, 255, 255, 0.2)'
-                    }}>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: 800,
-                                background: 'linear-gradient(45deg, #fff 30%, #f8f9ff 90%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                letterSpacing: -1
-                            }}
-                        >
-                            Mesob
-                        </Typography>
-                        {isAuthenticated ? (
-                            <Stack direction="row" spacing={2} alignItems="center">
-                                <Button
-                                    variant="text"
-                                    onClick={() => navigate('/profile')}
-                                    sx={{ color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}
-                                >
-                                    Hi, {user?.firstName}
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={handleLogout}
-                                    sx={{
-                                        color: 'white',
-                                        borderColor: 'rgba(255,255,255,0.3)',
-                                        '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
-                                    }}
-                                >
-                                    Logout
-                                </Button>
-                            </Stack>
-                        ) : (
-                            <Stack direction="row" spacing={2}>
-                                <Button
-                                    variant="text"
-                                    onClick={() => navigate('/login')}
-                                    sx={{ color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}
-                                >
-                                    Login
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => navigate('/register')}
-                                    sx={{
-                                        bgcolor: 'rgba(255,255,255,0.2)',
-                                        backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255,255,255,0.3)',
-                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
-                                    }}
-                                >
-                                    Sign Up
-                                </Button>
-                            </Stack>
-                        )}
-                    </Box>
-                </Container>
-            </Box>
 
             {/* Hero Section */}
             <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 10, py: 8 }}>

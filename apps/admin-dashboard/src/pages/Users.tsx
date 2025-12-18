@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../services/api';
 import type { User } from '@food-ordering/types';
 import { UserRole } from '@food-ordering/constants';
 import { Trash2, Edit, Search, User as UserIcon } from 'lucide-react';
@@ -13,14 +13,14 @@ const Users = () => {
     const { data: users, isLoading, error } = useQuery({
         queryKey: ['users'],
         queryFn: async () => {
-            const response = await axios.get('/api/users');
+            const response = await api.get('/users');
             return response.data.data.users as User[];
         },
     });
 
     const deleteMutation = useMutation({
         mutationFn: async (userId: string) => {
-            await axios.delete(`/api/users/${userId}`);
+            await api.delete(`/users/${userId}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });

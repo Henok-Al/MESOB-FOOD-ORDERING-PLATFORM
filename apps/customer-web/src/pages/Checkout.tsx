@@ -36,7 +36,7 @@ const Checkout: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const cart = useSelector((state: RootState) => state.cart);
-    const { isAuthenticated, isLoading } = useAuth(); // This will redirect to login if not authenticated
+    const { isLoading } = useAuth(); // This will redirect to login if not authenticated
 
     const [address, setAddress] = useState('');
     const [contactInfo, setContactInfo] = useState({ fullName: '', phone: '' });

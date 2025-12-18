@@ -36,32 +36,37 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, restaurantId }) => {
     };
 
     return (
-        <Card sx={{ display: 'flex', height: '100%', borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+        <Card sx={{ display: 'flex', height: '100%', borderRadius: 4, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 30px rgba(0,0,0,0.12)' } }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, position: 'relative' }}>
                 <CardContent sx={{ flex: '1 0 auto' }}>
-                    <Typography component="div" variant="h6" fontWeight="bold">
+                    <Typography component="div" variant="h6" fontWeight="bold" sx={{ color: 'primary.main' }}>
                         {product.name}
                     </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" component="div" sx={{ mb: 1 }}>
+                    <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'secondary.main', mb: 1 }}>
                         ${product.price.toFixed(2)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {product.description}
                     </Typography>
+                    {product.category && (
+                        <Box sx={{ display: 'inline-block', px: 2, py: 1, bgcolor: 'primary.50', borderRadius: 2, fontSize: '0.75rem', fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
+                            {product.category}
+                        </Box>
+                    )}
                 </CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 2 }}>
                     {cartItem ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#F5F6FA', borderRadius: 50 }}>
-                            <IconButton size="small" onClick={handleRemove} color="primary">
+                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'primary.50', borderRadius: 50, px: 1, py: 0.5 }}>
+                            <IconButton size="small" onClick={handleRemove} sx={{ color: 'primary.main' }}>
                                 <Remove fontSize="small" />
                             </IconButton>
-                            <Typography sx={{ mx: 1, fontWeight: 'bold' }}>{cartItem.quantity}</Typography>
-                            <IconButton size="small" onClick={handleAdd} color="primary">
+                            <Typography sx={{ mx: 1, fontWeight: 'bold', color: 'primary.main' }}>{cartItem.quantity}</Typography>
+                            <IconButton size="small" onClick={handleAdd} sx={{ color: 'primary.main' }}>
                                 <Add fontSize="small" />
                             </IconButton>
                         </Box>
                     ) : (
-                        <Button variant="contained" size="small" onClick={handleAdd} sx={{ borderRadius: 50 }}>
+                        <Button variant="contained" size="small" onClick={handleAdd} sx={{ borderRadius: 50, fontWeight: 'bold' }}>
                             Add to Cart
                         </Button>
                     )}
@@ -69,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, restaurantId }) => {
             </Box>
             <CardMedia
                 component="img"
-                sx={{ width: 140, objectFit: 'cover' }}
+                sx={{ width: 140, height: 140, objectFit: 'cover', borderTopRightRadius: 12, borderBottomRightRadius: 12 }}
                 image={product.image}
                 alt={product.name}
             />

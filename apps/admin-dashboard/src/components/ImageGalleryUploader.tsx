@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 interface ImageGalleryUploaderProps {
     value: string[];
@@ -34,7 +34,7 @@ const ImageGalleryUploader: React.FC<ImageGalleryUploaderProps> = ({
                 const formData = new FormData();
                 formData.append('image', file);
 
-                const response = await axios.post('/api/upload/image', formData, {
+                const response = await api.post('/upload/image', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
 
@@ -58,13 +58,6 @@ const ImageGalleryUploader: React.FC<ImageGalleryUploaderProps> = ({
         onChange(newImages);
     };
 
-    const handleReorder = (fromIndex: number, toIndex: number) => {
-        const newImages = [...images];
-        const [removed] = newImages.splice(fromIndex, 1);
-        newImages.splice(toIndex, 0, removed);
-        setImages(newImages);
-        onChange(newImages);
-    };
 
     return (
         <div className="space-y-4">

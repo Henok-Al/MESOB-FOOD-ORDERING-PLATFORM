@@ -5,6 +5,7 @@ import {
     createProduct,
     updateProduct,
     deleteProduct,
+    bulkUpdateProducts,
 } from '../controllers/productController';
 import { protect, requirePermission, validateOwnership } from '../middleware/auth';
 import { Permission } from '../config/permissions';
@@ -40,5 +41,13 @@ router
         validateOwnership('product'),
         deleteProduct
     );
+
+router.patch(
+    '/bulk',
+    protect,
+    requirePermission(Permission.UPDATE_MENU),
+    validateOwnership('restaurant'),
+    bulkUpdateProducts
+);
 
 export default router;

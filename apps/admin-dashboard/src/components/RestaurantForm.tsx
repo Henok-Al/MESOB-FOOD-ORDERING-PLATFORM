@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Restaurant, BusinessHours, SocialMedia } from '@food-ordering/types';
+import type { Restaurant, SocialMedia } from '@food-ordering/types';
 import BusinessHoursEditor from './BusinessHoursEditor';
 import ImageGalleryUploader from './ImageGalleryUploader';
 

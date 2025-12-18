@@ -4,8 +4,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, PieChart, Pie, Cell, Legend
 } from 'recharts';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 import { usePermission } from '../hooks/usePermission';
 
 interface DashboardData {
@@ -24,7 +23,6 @@ interface DashboardData {
 }
 
 const Dashboard = () => {
-    const { user } = useAuth();
     const { isAdmin } = usePermission();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -36,19 +34,15 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const token = localStorage.getItem('token');
             const params = new URLSearchParams();
             if (dateRange.startDate) params.append('startDate', dateRange.startDate);
             if (dateRange.endDate) params.append('endDate', dateRange.endDate);
 
             const endpoint = isAdmin
-                ? `/api/analytics/admin/dashboard?${params}`
-                : `/api/analytics/restaurant/dashboard?${params}`;
+                ? `/analytics/admin/dashboard?${params}`
+                : `/analytics/restaurant/dashboard?${params}`;
 
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${endpoint}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await api.get(endpoint);
             setData(response.data.data);
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error);
@@ -221,7 +215,7 @@ const Dashboard = () => {
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                 outerRadius={80}
                                 fill="#8884d8"
                                 dataKey="value"

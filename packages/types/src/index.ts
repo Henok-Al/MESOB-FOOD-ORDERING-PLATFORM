@@ -72,6 +72,8 @@ export interface Product {
     category: string;
     restaurant: string;
     isAvailable: boolean;
+    isVeg?: boolean;
+    isFeatured?: boolean;
 }
 
 export interface OrderItem {
@@ -147,4 +149,3 @@ export interface RestaurantAnalytics {
         count: number;
     }[];
 }
-

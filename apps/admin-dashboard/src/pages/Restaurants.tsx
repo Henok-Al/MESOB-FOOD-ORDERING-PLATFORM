@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../services/api';
 import type { Restaurant } from '@food-ordering/types';
 import { Search, MapPin, Star, Plus, Edit, Trash2, Menu as MenuIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,20 +11,22 @@ const Restaurants = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | undefined>(undefined);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(6);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { data: restaurants, isLoading, error } = useQuery({
         queryKey: ['restaurants'],
         queryFn: async () => {
-            const response = await axios.get('/api/restaurants/admin/all');
+            const response = await api.get('/restaurants/admin/all');
             return response.data.data.restaurants as Restaurant[];
         },
     });
 
     const createMutation = useMutation({
         mutationFn: async (newRestaurant: Partial<Restaurant>) => {
-            await axios.post('/api/restaurants', newRestaurant);
+            await api.post('/restaurants', newRestaurant);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['restaurants'] });
@@ -34,7 +36,7 @@ const Restaurants = () => {
 
     const updateMutation = useMutation({
         mutationFn: async ({ id, data }: { id: string; data: Partial<Restaurant> }) => {
-            await axios.patch(`/api/restaurants/${id}`, data);
+            await api.patch(`/restaurants/${id}`, data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['restaurants'] });
@@ -45,7 +47,7 @@ const Restaurants = () => {
 
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
-            await axios.delete(`/api/restaurants/${id}`);
+            await api.delete(`/restaurants/${id}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['restaurants'] });
@@ -79,10 +81,11 @@ const Restaurants = () => {
         }
     };
 
-    const filteredRestaurants = restaurants?.filter(restaurant =>
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredRestaurants = restaurants?.filter(restaurant => {
+        const nameMatch = restaurant.name?.toLowerCase()?.includes(searchTerm.toLowerCase());
+        const cuisineMatch = restaurant.cuisine?.toLowerCase()?.includes(searchTerm.toLowerCase());
+        return nameMatch || cuisineMatch;
+    });
 
     if (isLoading) return <div className="p-6">Loading restaurants...</div>;
     if (error) return <div className="p-6 text-red-600">Error loading restaurants</div>;

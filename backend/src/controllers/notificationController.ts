@@ -133,3 +133,110 @@ export const createNotification = async (
         console.error('Error creating notification:', error);
     }
 };
+
+// @desc    Subscribe user to push notifications
+// @route   POST /api/notifications/subscribe
+// @access  Private
+export const subscribeToPushNotifications = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { fcmToken } = req.body;
+        
+        if (!fcmToken) {
+            res.status(400).json({ status: 'fail', message: 'FCM token is required' });
+            return;
+        }
+        
+        // In a real implementation, you would store this token in your database
+        // associated with the user's account
+        console.log(`User ${req.user!._id} subscribed with FCM token: ${fcmToken}`);
+        
+        // Here you would typically:
+        // 1. Store the FCM token in your database
+        // 2. Associate it with the user's account
+        // 3. Handle token updates/replacements
+        
+        res.status(200).json({
+            status: 'success',
+            message: 'Successfully subscribed to push notifications',
+            data: { fcmToken }
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Send test push notification
+// @route   POST /api/notifications/test-push
+// @access  Private (Admin only)
+export const sendTestPushNotification = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId, title, body } = req.body;
+        
+        if (!userId || !title || !body) {
+            res.status(400).json({ status: 'fail', message: 'userId, title, and body are required' });
+            return;
+        }
+        
+        // In a real implementation, you would:
+        // 1. Look up the user's FCM token from your database
+        // 2. Use Firebase Admin SDK to send the push notification
+        // 3. Handle the response and errors appropriately
+        
+        console.log(`Sending test push notification to user ${userId}: ${title} - ${body}`);
+        
+        // Mock response - in reality this would be the Firebase response
+        const mockResponse = {
+            success: true,
+            messageId: 'mock-message-id-' + Date.now(),
+            token: 'mock-fcm-token'
+        };
+        
+        res.status(200).json({
+            status: 'success',
+            message: 'Test push notification sent successfully',
+            data: mockResponse
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};
+
+// @desc    Send push notification to specific user
+// @route   POST /api/notifications/send-push
+// @access  Private (Admin only)
+export const sendPushNotification = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId, notificationData } = req.body;
+        
+        if (!userId || !notificationData) {
+            res.status(400).json({ status: 'fail', message: 'userId and notificationData are required' });
+            return;
+        }
+        
+        // In a real implementation:
+        // 1. Look up the user's FCM token
+        // 2. Send push notification using Firebase Admin SDK
+        // 3. Also create an in-app notification for consistency
+        
+        console.log(`Sending push notification to user ${userId}:`, notificationData);
+        
+        // Create in-app notification as well
+        await createNotification(
+            userId,
+            NotificationType.SYSTEM,
+            notificationData.title,
+            notificationData.body,
+            {
+                actionUrl: notificationData.click_action,
+                imageUrl: notificationData.image
+            }
+        );
+        
+        res.status(200).json({
+            status: 'success',
+            message: 'Push notification sent and in-app notification created',
+        });
+    } catch (error: any) {
+        res.status(400).json({ status: 'fail', message: error.message });
+    }
+};

@@ -30,33 +30,33 @@ router.use('/:restaurantId/products', productRouter);
 router.get('/featured', getFeaturedRestaurants);
 router.post('/seed', seedRestaurants);
 
-// Get current user's restaurant
-router.get('/me', requirePermission(Permission.VIEW_RESTAURANT), getMyRestaurant);
+// Get current user's restaurant (protected)
+router.get('/me', protect, requirePermission(Permission.VIEW_RESTAURANT), getMyRestaurant);
 
 // Admin-only route to get all restaurants (including inactive)
 router
     .route('/admin/all')
-    .get(requirePermission(Permission.VIEW_RESTAURANT), getAllRestaurants);
+    .get(protect, requirePermission(Permission.VIEW_RESTAURANT), getAllRestaurants);
 
 router
     .route('/')
     .get(getAllRestaurants)
-    .post(requirePermission(Permission.CREATE_RESTAURANT), createRestaurant);
+    .post(protect, requirePermission(Permission.CREATE_RESTAURANT), createRestaurant);
 
 router.route('/:id')
     .get(getRestaurantById)
-    .patch(requirePermission(Permission.UPDATE_RESTAURANT), validateBody(createRestaurantSchema), updateRestaurant)
-    .delete(requirePermission(Permission.DELETE_RESTAURANT), deleteRestaurant);
+    .patch(protect, requirePermission(Permission.UPDATE_RESTAURANT), validateBody(createRestaurantSchema), updateRestaurant)
+    .delete(protect, requirePermission(Permission.DELETE_RESTAURANT), deleteRestaurant);
 
 router.route('/:id/status')
-    .patch(requirePermission(Permission.UPDATE_RESTAURANT), updateRestaurantStatus);
+    .patch(protect, requirePermission(Permission.UPDATE_RESTAURANT), updateRestaurantStatus);
 
 // New routes
 router.post('/:id/view', incrementViewCount);
 
-router.patch('/:id/hours', requirePermission(Permission.UPDATE_RESTAURANT), updateRestaurantHours);
+router.patch('/:id/hours', protect, requirePermission(Permission.UPDATE_RESTAURANT), updateRestaurantHours);
 
-router.get('/:id/analytics', requirePermission(Permission.VIEW_RESTAURANT), getRestaurantAnalytics);
+router.get('/:id/analytics', protect, requirePermission(Permission.VIEW_RESTAURANT), getRestaurantAnalytics);
 
 export default router;
 

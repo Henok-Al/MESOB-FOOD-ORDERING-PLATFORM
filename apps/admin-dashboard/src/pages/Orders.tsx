@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../services/api';
 import {
     Dialog,
     DialogContent,
@@ -55,26 +55,17 @@ const Orders = () => {
     const { data, isLoading } = useQuery({
         queryKey: ['admin-orders', statusFilter],
         queryFn: async () => {
-            const token = localStorage.getItem('token');
             const params = new URLSearchParams();
             if (statusFilter !== 'all') params.append('status', statusFilter);
 
-            const response = await axios.get(
-                `/api/orders?${params}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await api.get(`/orders/admin/all?${params}`);
             return response.data.data.orders as Order[];
         },
     });
 
     const updatePaymentStatusMutation = useMutation({
         mutationFn: async ({ orderId, paymentStatus }: { orderId: string; paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' }) => {
-            const token = localStorage.getItem('token');
-            await axios.patch(
-                `/api/orders/${orderId}/payment`,
-                { paymentStatus },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await api.patch(`/orders/${orderId}/payment`, { paymentStatus });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
@@ -84,12 +75,7 @@ const Orders = () => {
 
     const updateStatusMutation = useMutation({
         mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
-            const token = localStorage.getItem('token');
-            await axios.patch(
-                `/api/orders/${orderId}/status`,
-                { status },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await api.patch(`/orders/${orderId}/status`, { status });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
@@ -244,7 +230,7 @@ const Orders = () => {
 
             {/* Order Details Modal */}
             <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl bg-white dark:bg-gray-800">
                     <DialogHeader>
                         <DialogTitle>Order Details - #{selectedOrder?._id.slice(-6).toUpperCase()}</DialogTitle>
                     </DialogHeader>

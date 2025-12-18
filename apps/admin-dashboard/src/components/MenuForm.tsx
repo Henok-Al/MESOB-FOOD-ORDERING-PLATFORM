@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import type { Product } from '@food-ordering/types';
+import ImageUpload from './ImageUpload';
 
 interface MenuFormProps {
     initialData?: Product;
     onSubmit: (data: Partial<Product>) => void;
     onCancel: () => void;
     isLoading?: boolean;
+    categories?: string[];
 }
 
-const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, isLoading }) => {
+const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, isLoading, categories }) => {
     const [formData, setFormData] = useState<Partial<Product>>({
         name: '',
         description: '',
@@ -16,6 +18,8 @@ const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, is
         category: '',
         image: '',
         isAvailable: true,
+        isVeg: false,
+        isFeatured: false,
     });
 
     useEffect(() => {
@@ -27,6 +31,8 @@ const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, is
                 category: initialData.category,
                 image: initialData.image,
                 isAvailable: initialData.isAvailable,
+                isVeg: initialData.isVeg ?? false,
+                isFeatured: initialData.isFeatured ?? false,
             });
         }
     }, [initialData]);
@@ -93,25 +99,39 @@ const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, is
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Category</label>
-                    <input
-                        type="text"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
-                    />
+                    {categories && categories.length > 0 ? (
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                        >
+                            <option value="" disabled>
+                                Select category
+                            </option>
+                            {categories.map((c) => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
+                        </select>
+                    ) : (
+                        <input
+                            type="text"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                        />
+                    )}
                 </div>
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                <label className="block text-sm font-medium text-gray-700">Image</label>
+                <ImageUpload
+                    value={formData.image || ''}
+                    onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
                 />
             </div>
 
@@ -124,6 +144,29 @@ const MenuForm: React.FC<MenuFormProps> = ({ initialData, onSubmit, onCancel, is
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label className="ml-2 block text-sm text-gray-900">Available</label>
+            </div>
+
+            <div className="flex items-center gap-6">
+                <div className="flex items-center">
+                    <input
+                        type="checkbox"
+                        name="isVeg"
+                        checked={!!formData.isVeg}
+                        onChange={handleCheckboxChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 block text-sm text-gray-900">Vegetarian</label>
+                </div>
+                <div className="flex items-center">
+                    <input
+                        type="checkbox"
+                        name="isFeatured"
+                        checked={!!formData.isFeatured}
+                        onChange={handleCheckboxChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 block text-sm text-gray-900">Featured</label>
+                </div>
             </div>
 
             <div className="flex justify-end space-x-3 pt-4">

@@ -8,6 +8,8 @@ export interface IProduct extends Document {
     category: string;
     restaurant: mongoose.Schema.Types.ObjectId;
     isAvailable: boolean;
+    isVeg: boolean;
+    isFeatured: boolean;
     createdAt: Date;
 }
 
@@ -43,6 +45,14 @@ const productSchema = new Schema<IProduct>({
     isAvailable: {
         type: Boolean,
         default: true,
+    },
+    isVeg: {
+        type: Boolean,
+        default: false,
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false,
     },
     createdAt: {
         type: Date,

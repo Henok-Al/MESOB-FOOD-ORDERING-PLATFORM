@@ -3,7 +3,9 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store } from './store';
-import { theme } from './theme';
+import { getTheme } from './theme';
+import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
+import { NotificationProvider } from './context/NotificationContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,64 +16,80 @@ import Profile from './pages/Profile';
 import OrderTracking from './pages/OrderTracking';
 import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/ProtectedRoute';
+import MainLayout from './components/layout/MainLayout';
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+    const { darkMode } = useDarkMode();
+    const theme = getTheme(darkMode);
+
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <BrowserRouter>
+                <MainLayout>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/restaurant/:id" element={<RestaurantDetails />} />
+                        <Route
+                            path="/checkout"
+                            element={(
+                                <ProtectedRoute>
+                                    <Checkout />
+                                </ProtectedRoute>
+                            )}
+                        />
+                        <Route
+                            path="/orders"
+                            element={(
+                                <ProtectedRoute>
+                                    <Orders />
+                                </ProtectedRoute>
+                            )}
+                        />
+                        <Route
+                            path="/orders/:orderId/track"
+                            element={(
+                                <ProtectedRoute>
+                                    <OrderTracking />
+                                </ProtectedRoute>
+                            )}
+                        />
+                        <Route
+                            path="/profile"
+                            element={(
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            )}
+                        />
+                        <Route
+                            path="/notifications"
+                            element={(
+                                <ProtectedRoute>
+                                    <Notifications />
+                                </ProtectedRoute>
+                            )}
+                        />
+                    </Routes>
+                </MainLayout>
+            </BrowserRouter>
+        </ThemeProvider>
+    );
+}
 
 function App() {
     return (
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            <Route path="/restaurant/:id" element={<RestaurantDetails />} />
-                            <Route
-                                path="/checkout"
-                                element={(
-                                    <ProtectedRoute>
-                                        <Checkout />
-                                    </ProtectedRoute>
-                                )}
-                            />
-                            <Route
-                                path="/orders"
-                                element={(
-                                    <ProtectedRoute>
-                                        <Orders />
-                                    </ProtectedRoute>
-                                )}
-                            />
-                            <Route
-                                path="/orders/:orderId/track"
-                                element={(
-                                    <ProtectedRoute>
-                                        <OrderTracking />
-                                    </ProtectedRoute>
-                                )}
-                            />
-                            <Route
-                                path="/profile"
-                                element={(
-                                    <ProtectedRoute>
-                                        <Profile />
-                                    </ProtectedRoute>
-                                )}
-                            />
-                            <Route
-                                path="/notifications"
-                                element={(
-                                    <ProtectedRoute>
-                                        <Notifications />
-                                    </ProtectedRoute>
-                                )}
-                            />
-                        </Routes>
-                    </BrowserRouter>
-                </ThemeProvider>
+                <DarkModeProvider>
+                    <NotificationProvider>
+                        <AppContent />
+                    </NotificationProvider>
+                </DarkModeProvider>
             </QueryClientProvider>
         </Provider>
     );

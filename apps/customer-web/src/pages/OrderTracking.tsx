@@ -19,7 +19,7 @@ import {
     Home,
     Cancel,
 } from '@mui/icons-material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import { OrderStatus } from '@food-ordering/constants';
 import { io, Socket } from 'socket.io-client';
@@ -53,7 +53,6 @@ interface Order {
 
 const OrderTracking: React.FC = () => {
     const { orderId } = useParams<{ orderId: string }>();
-    const navigate = useNavigate();
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [socket, setSocket] = useState<Socket | null>(null);
