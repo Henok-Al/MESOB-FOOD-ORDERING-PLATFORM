@@ -20,6 +20,16 @@ export interface IUser extends Document {
     password?: string;
     role: UserRole;
     addresses: IAddress[];
+    driverProfile?: {
+        isAvailable: boolean;
+        vehicleType?: string;
+        licensePlate?: string;
+        currentLocation?: {
+            type: 'Point';
+            coordinates: number[];
+        };
+        lastActiveAt?: Date;
+    };
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
     getSignedJwtToken(): string;
@@ -81,12 +91,32 @@ const userSchema = new Schema<IUser>({
         enum: Object.values(UserRole),
         default: UserRole.CUSTOMER,
     },
+    driverProfile: {
+        isAvailable: { type: Boolean, default: false },
+        vehicleType: { type: String, trim: true },
+        licensePlate: { type: String, trim: true },
+        currentLocation: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point',
+            },
+            coordinates: {
+                type: [Number], // [lng, lat]
+                default: [0, 0],
+            },
+        },
+        lastActiveAt: { type: Date, default: Date.now },
+    },
     addresses: [addressSchema],
     createdAt: {
         type: Date,
         default: Date.now,
     },
 });
+
+// Geo index for driver location queries
+userSchema.index({ 'driverProfile.currentLocation': '2dsphere' });
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function (next) {

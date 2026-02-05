@@ -36,37 +36,82 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, restaurantId }) => {
     };
 
     return (
-        <Card sx={{ display: 'flex', height: '100%', borderRadius: 4, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 30px rgba(0,0,0,0.12)' } }}>
+        <Card sx={{ 
+            display: 'flex', 
+            height: '100%', 
+            borderRadius: '8px', 
+            boxShadow: 'none',
+            border: '1px solid #e0e0e0',
+            transition: 'all 0.2s ease',
+            '&:hover': { 
+                borderColor: 'text.primary',
+                transform: 'translateY(-2px)' 
+            }
+        }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, position: 'relative' }}>
                 <CardContent sx={{ flex: '1 0 auto' }}>
-                    <Typography component="div" variant="h6" fontWeight="bold" sx={{ color: 'primary.main' }}>
+                    <Typography component="div" variant="h6" fontWeight="600" sx={{ color: 'text.primary', mb: 1 }}>
                         {product.name}
                     </Typography>
-                    <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'secondary.main', mb: 1 }}>
+                    <Typography variant="subtitle1" fontWeight="600" sx={{ color: 'text.secondary', mb: 1 }}>
                         ${product.price.toFixed(2)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ 
+                        mb: 2, 
+                        display: '-webkit-box', 
+                        WebkitLineClamp: 2, 
+                        WebkitBoxOrient: 'vertical', 
+                        overflow: 'hidden'
+                    }}>
                         {product.description}
                     </Typography>
                     {product.category && (
-                        <Box sx={{ display: 'inline-block', px: 2, py: 1, bgcolor: 'primary.50', borderRadius: 2, fontSize: '0.75rem', fontWeight: 'bold', color: 'primary.main', mb: 1 }}>
+                        <Box sx={{ 
+                            display: 'inline-block', 
+                            px: 2, 
+                            py: 1, 
+                            bgcolor: 'background.paper',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem', 
+                            fontWeight: '600', 
+                            color: 'text.secondary',
+                            mb: 1,
+                            border: '1px solid #e0e0e0'
+                        }}>
                             {product.category}
                         </Box>
                     )}
                 </CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 2 }}>
                     {cartItem ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'primary.50', borderRadius: 50, px: 1, py: 0.5 }}>
-                            <IconButton size="small" onClick={handleRemove} sx={{ color: 'primary.main' }}>
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            bgcolor: 'background.paper',
+                            borderRadius: '4px',
+                            px: 1, 
+                            py: 0.5,
+                            border: '1px solid #e0e0e0'
+                        }}>
+                            <IconButton size="small" onClick={handleRemove} sx={{ color: 'text.primary' }}>
                                 <Remove fontSize="small" />
                             </IconButton>
-                            <Typography sx={{ mx: 1, fontWeight: 'bold', color: 'primary.main' }}>{cartItem.quantity}</Typography>
-                            <IconButton size="small" onClick={handleAdd} sx={{ color: 'primary.main' }}>
+                            <Typography sx={{ mx: 1, fontWeight: '600', color: 'text.primary' }}>{cartItem.quantity}</Typography>
+                            <IconButton size="small" onClick={handleAdd} sx={{ color: 'text.primary' }}>
                                 <Add fontSize="small" />
                             </IconButton>
                         </Box>
                     ) : (
-                        <Button variant="contained" size="small" onClick={handleAdd} sx={{ borderRadius: 50, fontWeight: 'bold' }}>
+                        <Button 
+                            variant="contained" 
+                            size="small" 
+                            onClick={handleAdd}
+                            sx={{ 
+                                borderRadius: '4px', 
+                                fontWeight: '600',
+                                textTransform: 'none'
+                            }}
+                        >
                             Add to Cart
                         </Button>
                     )}
@@ -74,7 +119,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, restaurantId }) => {
             </Box>
             <CardMedia
                 component="img"
-                sx={{ width: 140, height: 140, objectFit: 'cover', borderTopRightRadius: 12, borderBottomRightRadius: 12 }}
+                sx={{ 
+                    width: 140, 
+                    height: 140, 
+                    objectFit: 'cover', 
+                    borderTopRightRadius: '8px', 
+                    borderBottomRightRadius: '8px'
+                }}
                 image={product.image}
                 alt={product.name}
             />

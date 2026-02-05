@@ -8,6 +8,8 @@ import {
     Chip,
     Rating,
     IconButton,
+    Stack,
+    Tooltip,
 } from '@mui/material';
 import { FavoriteBorder, DeliveryDining, Star } from '@mui/icons-material';
 import { Restaurant } from '@food-ordering/types';
@@ -44,27 +46,27 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'relative',
-                transition: 'transform 0.2s',
                 cursor: 'pointer',
-                '&:hover': {
-                    transform: 'translateY(-4px)',
-                },
+                overflow: 'hidden',
             }}
             onClick={() => navigate(`/restaurant/${restaurant._id || restaurant.id}`)}
         >
             <Box sx={{ position: 'relative' }}>
                 <CardMedia
                     component="img"
-                    height="200"
+                    height="220"
                     image={restaurant.imageUrl}
                     alt={restaurant.name}
+                    sx={{ filter: 'saturate(1.05)' }}
                 />
                 <IconButton
                     sx={{
                         position: 'absolute',
                         top: 8,
                         right: 8,
-                        bgcolor: 'white',
+                        bgcolor: 'rgba(255,250,243,0.9)',
+                        borderRadius: 12,
+                        boxShadow: '0 8px 18px rgba(31,18,12,0.12)',
                         '&:hover': { bgcolor: 'white' },
                     }}
                     size="small"
@@ -76,14 +78,16 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                 {restaurant.isFeatured && (
                     <Chip
                         icon={<Star sx={{ fontSize: 16 }} />}
-                        label="Featured"
+                        label="Chef pick"
                         size="small"
-                        color="warning"
+                        color="secondary"
                         sx={{
                             position: 'absolute',
-                            top: 8,
-                            left: 8,
-                            fontWeight: 600,
+                            top: 10,
+                            left: 10,
+                            fontWeight: 700,
+                            borderRadius: 999,
+                            boxShadow: '0 8px 18px rgba(31,18,12,0.12)',
                         }}
                     />
                 )}
@@ -94,56 +98,72 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                     size="small"
                     sx={{
                         position: 'absolute',
-                        bottom: 8,
-                        right: 8,
-                        bgcolor: 'white',
-                        fontWeight: 600,
+                        bottom: 10,
+                        right: 10,
+                        bgcolor: 'rgba(255,250,243,0.94)',
+                        fontWeight: 700,
+                        borderRadius: 999,
+                        boxShadow: '0 6px 16px rgba(31,18,12,0.12)',
                     }}
                 />
 
                 {/* Open Now Badge */}
                 {restaurant.hours && (
                     <Chip
-                        label={isOpen ? 'Open Now' : 'Closed'}
+                        label={isOpen ? 'Open now' : 'Closed'}
                         size="small"
                         color={isOpen ? 'success' : 'default'}
                         sx={{
                             position: 'absolute',
-                            bottom: 8,
-                            left: 8,
-                            fontWeight: 600,
+                            bottom: 10,
+                            left: 10,
+                            fontWeight: 700,
+                            borderRadius: 999,
+                            boxShadow: '0 6px 16px rgba(31,18,12,0.12)',
                         }}
                     />
                 )}
             </Box>
 
-            <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Typography variant="h6" component="h2" fontWeight="bold" noWrap>
-                        {restaurant.name}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#F5F6FA', px: 0.5, borderRadius: 1 }}>
-                        <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
-                            {restaurant.rating}
+            <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="h6" component="h2" fontWeight={800} noWrap>
+                            {restaurant.name}
                         </Typography>
-                        <Rating value={1} max={1} size="small" readOnly />
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                            {restaurant.cuisine}
+                        </Typography>
                     </Box>
+                    <Tooltip title="Average rating">
+                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(213,159,101,0.12)', px: 1, py: 0.3, borderRadius: 999 }}>
+                            <Typography variant="body2" fontWeight={800} sx={{ mr: 0.5 }}>
+                                {restaurant.rating?.toFixed?.(1) || restaurant.rating}
+                            </Typography>
+                            <Rating value={1} max={1} size="small" readOnly />
+                        </Box>
+                    </Tooltip>
                 </Box>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }} noWrap>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.5 }} noWrap>
                     {restaurant.description}
                 </Typography>
 
                 {/* Tags */}
                 {restaurant.tags && restaurant.tags.length > 0 && (
-                    <Box sx={{ display: 'flex', gap: 0.5, mb: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', gap: 0.6, mb: 2, flexWrap: 'wrap' }}>
                         {restaurant.tags.slice(0, 3).map((tag, index) => (
                             <Chip
                                 key={index}
                                 label={tag}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: '0.7rem', height: 20 }}
+                                sx={{
+                                    fontSize: '0.72rem',
+                                    height: 22,
+                                    borderRadius: 999,
+                                    borderColor: 'rgba(31,18,12,0.12)',
+                                }}
                             />
                         ))}
                         {restaurant.tags.length > 3 && (
@@ -151,24 +171,23 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                                 label={`+${restaurant.tags.length - 3}`}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: '0.7rem', height: 20 }}
+                                sx={{ fontSize: '0.72rem', height: 22, borderRadius: 999, borderColor: 'rgba(31,18,12,0.12)' }}
                             />
                         )}
                     </Box>
                 )}
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 'auto' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 'auto', color: 'text.secondary' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <DeliveryDining sx={{ fontSize: 16, mr: 0.5 }} />
-                        <Typography variant="caption">${restaurant.minOrder} min</Typography>
+                        <Typography variant="caption">{restaurant.minOrder} min</Typography>
                     </Box>
-                    <Typography variant="caption" color="text.secondary">•</Typography>
-                    <Typography variant="caption" color="text.secondary">{restaurant.cuisine}</Typography>
-                </Box>
+                    <Typography variant="caption" color="text.disabled">•</Typography>
+                    <Typography variant="caption" color="text.secondary">ETB {restaurant.deliveryFee || 0} delivery</Typography>
+                </Stack>
             </CardContent>
         </Card>
     );
 };
 
 export default RestaurantCard;
-

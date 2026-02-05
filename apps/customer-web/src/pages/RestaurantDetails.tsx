@@ -11,8 +11,6 @@ import {
     Avatar,
     Rating,
     Pagination,
-    Fade,
-    Slide,
     Card,
     CardContent,
     CardMedia,
@@ -20,35 +18,22 @@ import {
     Badge,
     Tabs,
     Tab,
-    Fab,
-    Switch,
-    FormControlLabel,
     Divider,
-    Tooltip,
 } from '@mui/material';
 import {
     Star,
     AccessTime,
     DeliveryDining,
     ShoppingCart,
-    Favorite,
-    FavoriteBorder,
-    LocalOffer,
-    ThumbUp,
+    Restaurant as RestaurantIcon,
+    LocationOn,
     Comment,
-    Photo,
     ArrowBack,
     Add,
     Remove,
-    Restaurant as RestaurantIcon,
-    LocationOn,
-    DarkMode,
-    LightMode,
-    Notifications,
-    Share,
-    Info,
-    Phone,
-    Schedule,
+    LocalOffer,
+    ThumbUp,
+    Photo,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -56,7 +41,6 @@ import api from '../services/api';
 import { RootState } from '../store';
 import { addToCart, removeFromCart } from '../store/slices/cartSlice';
 import { Restaurant, Product } from '@food-ordering/types';
-import { useDarkMode } from '../context/DarkModeContext';
 
 interface Review {
     _id: string;
@@ -91,7 +75,6 @@ const RestaurantDetails: React.FC = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-    const { darkMode, toggleDarkMode } = useDarkMode();
     const cart = useSelector((state: RootState) => state.cart);
 
     useEffect(() => {
@@ -151,18 +134,6 @@ const RestaurantDetails: React.FC = () => {
         setFavorites(newFavorites);
     };
 
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({
-                title: restaurant?.name || 'Restaurant',
-                text: `Check out ${restaurant?.name} on Mesob Food Ordering!`,
-                url: window.location.href,
-            });
-        } else {
-            alert('Share functionality not supported in your browser');
-        }
-    };
-
     const groupedProducts = products.reduce((acc, product) => {
         const category = product.category || 'Other';
         if (!acc[category]) {
@@ -181,9 +152,9 @@ const RestaurantDetails: React.FC = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 minHeight: '100vh',
-                background: darkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+                backgroundColor: 'background.default'
             }}>
-                <CircularProgress size={60} thickness={4} sx={{ color: darkMode ? 'white' : 'primary.main' }} />
+                <CircularProgress size={60} sx={{ color: 'primary.main' }} />
             </Box>
         );
     }
@@ -193,14 +164,14 @@ const RestaurantDetails: React.FC = () => {
             <Container sx={{
                 py: 8,
                 textAlign: 'center',
-                background: darkMode ? '#1a1a2e' : '#f5f7fa',
+                backgroundColor: 'background.default',
                 minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <Typography variant="h4" sx={{ mb: 4, color: darkMode ? 'white' : 'text.primary' }}>
+                <Typography variant="h4" sx={{ mb: 4, color: 'text.primary' }}>
                     Restaurant not found
                 </Typography>
                 <Button
@@ -208,11 +179,10 @@ const RestaurantDetails: React.FC = () => {
                     size="large"
                     onClick={() => navigate('/')}
                     sx={{
-                        bgcolor: darkMode ? 'primary.main' : 'linear-gradient(45deg, #0ea5e9 30%, #ec4899 90%)',
-                        color: 'white',
+                        borderRadius: '4px',
                         px: 6,
                         py: 1.5,
-                        borderRadius: 50
+                        fontWeight: 700
                     }}
                 >
                     Back to Home
@@ -224,61 +194,38 @@ const RestaurantDetails: React.FC = () => {
     return (
         <Box sx={{
             minHeight: '100vh',
-            background: darkMode
-                ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)'
-                : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'background 0.5s ease'
+            backgroundColor: 'background.default'
         }}>
-            {/* Professional Header with Controls */}
+
+            {/* Header with Controls */}
             <Box sx={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
                 zIndex: 1200,
-                bgcolor: darkMode ? 'rgba(26, 26, 46, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                borderBottom: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
+                backgroundColor: 'background.default',
+                borderBottom: '1px solid #e0e0e0',
                 px: 4,
                 py: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                boxShadow: darkMode ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.05)'
+                boxShadow: 'none'
             }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                    <IconButton onClick={() => navigate('/')} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
+                    <IconButton onClick={() => navigate('/')} sx={{ color: 'text.primary' }}>
                         <ArrowBack />
                     </IconButton>
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary' }}>
                         {restaurant.name}
                     </Typography>
                 </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Tooltip title="Share Restaurant">
-                        <IconButton onClick={handleShare} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                            <Share />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Toggle Dark Mode">
-                        <IconButton onClick={toggleDarkMode} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                            {darkMode ? <LightMode /> : <DarkMode />}
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Notifications">
-                        <IconButton onClick={() => navigate('/notifications')} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                            <Notifications />
-                        </IconButton>
-                    </Tooltip>
-                </Box>
             </Box>
 
-            {/* Professional Hero Section */}
+            {/* Hero Section */}
             <Box sx={{
-                height: { xs: 400, md: 500 },
+                height: { xs: 300, md: 400 },
                 mt: 12, // Account for fixed header
                 position: 'relative',
                 overflow: 'hidden'
@@ -292,7 +239,7 @@ const RestaurantDetails: React.FC = () => {
                     backgroundImage: `url(${restaurant.imageUrl})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    filter: 'blur(8px) scale(1.1)',
+                    filter: 'blur(4px) scale(1.1)',
                     transform: 'translateZ(0)',
                     zIndex: 1
                 }} />
@@ -303,10 +250,8 @@ const RestaurantDetails: React.FC = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: darkMode
-                        ? 'linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.95) 100%)'
-                        : 'linear-gradient(135deg, rgba(245, 247, 250, 0.85) 0%, rgba(195, 207, 226, 0.95) 100%)',
-                    backdropFilter: 'blur(10px)',
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(8px)',
                     zIndex: 2
                 }} />
                 
@@ -323,193 +268,166 @@ const RestaurantDetails: React.FC = () => {
                     {/* Restaurant Info */}
                     <Box sx={{
                         flex: 1,
-                        color: darkMode ? 'white' : 'text.primary',
+                        color: 'text.primary',
                         maxWidth: { xs: '100%', md: 600 }
                     }}>
-                        <Fade in={true} timeout={800}>
-                            <Typography
-                                variant="h1"
-                                sx={{
-                                    fontWeight: 900,
-                                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                                    lineHeight: 1.1,
-                                    mb: 3,
-                                    background: darkMode
-                                        ? 'linear-gradient(45deg, #0ea5e9, #ec4899)'
-                                        : 'linear-gradient(45deg, #0ea5e9, #ec4899)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text'
-                                }}
-                            >
-                                {restaurant.name}
-                            </Typography>
-                        </Fade>
+                        <Typography
+                            variant="h1"
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                                lineHeight: 1.1,
+                                mb: 3,
+                                color: 'text.primary'
+                            }}
+                        >
+                            {restaurant.name}
+                        </Typography>
 
-                        <Fade in={true} timeout={1000}>
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    fontWeight: 500,
-                                    lineHeight: 1.6,
-                                    mb: 4,
-                                    opacity: 0.95,
-                                    fontSize: { xs: '1.1rem', md: '1.3rem' }
-                                }}
-                            >
-                                {restaurant.description}
-                            </Typography>
-                        </Fade>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: 500,
+                                lineHeight: 1.6,
+                                mb: 4,
+                                opacity: 0.95,
+                                fontSize: { xs: '1.1rem', md: '1.3rem' },
+                                color: 'text.secondary'
+                            }}
+                        >
+                            {restaurant.description}
+                        </Typography>
 
                         {/* Restaurant Details Grid */}
-                        <Fade in={true} timeout={1200}>
-                            <Grid container spacing={3} sx={{ mb: 4 }}>
-                                <Grid item xs={6} sm={3}>
-                                    <Box sx={{ textAlign: 'center' }}>
-                                        <Chip
-                                            icon={<Star sx={{ color: '#FFD700', fontSize: '1.2rem' }} />}
-                                            label={`${restaurant.rating}`}
-                                            sx={{
-                                                bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-                                                color: darkMode ? 'white' : 'text.primary',
-                                                fontWeight: 700,
-                                                fontSize: '1.1rem',
-                                                px: 2,
-                                                py: 1,
-                                                borderRadius: 2,
-                                                mb: 1,
-                                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : 'none'
-                                            }}
-                                        />
-                                        <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled' }}>
-                                            Rating
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={6} sm={3}>
-                                    <Box sx={{ textAlign: 'center' }}>
-                                        <Chip
-                                            icon={<AccessTime sx={{ color: '#0ea5e9', fontSize: '1.2rem' }} />}
-                                            label={restaurant.deliveryTime}
-                                            sx={{
-                                                bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-                                                color: darkMode ? 'white' : 'text.primary',
-                                                fontWeight: 700,
-                                                fontSize: '1.1rem',
-                                                px: 2,
-                                                py: 1,
-                                                borderRadius: 2,
-                                                mb: 1,
-                                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : 'none'
-                                            }}
-                                        />
-                                        <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled' }}>
-                                            Delivery Time
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={6} sm={3}>
-                                    <Box sx={{ textAlign: 'center' }}>
-                                        <Chip
-                                            icon={<DeliveryDining sx={{ color: '#10b981', fontSize: '1.2rem' }} />}
-                                            label={`$${restaurant.minOrder}+`}
-                                            sx={{
-                                                bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-                                                color: darkMode ? 'white' : 'text.primary',
-                                                fontWeight: 700,
-                                                fontSize: '1.1rem',
-                                                px: 2,
-                                                py: 1,
-                                                borderRadius: 2,
-                                                mb: 1,
-                                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : 'none'
-                                            }}
-                                        />
-                                        <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled' }}>
-                                            Min Order
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={6} sm={3}>
-                                    <Box sx={{ textAlign: 'center' }}>
-                                        <Chip
-                                            icon={<RestaurantIcon sx={{ color: '#f59e0b', fontSize: '1.2rem' }} />}
-                                            label={restaurant.cuisine || 'Various'}
-                                            sx={{
-                                                bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-                                                color: darkMode ? 'white' : 'text.primary',
-                                                fontWeight: 700,
-                                                fontSize: '1.1rem',
-                                                px: 2,
-                                                py: 1,
-                                                borderRadius: 2,
-                                                mb: 1,
-                                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : 'none'
-                                            }}
-                                        />
-                                        <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled' }}>
-                                            Cuisine
-                                        </Typography>
-                                    </Box>
-                                </Grid>
+                        <Grid container spacing={3} sx={{ mb: 4 }}>
+                            <Grid item xs={6} sm={3}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                    <Chip
+                                        icon={<Star sx={{ color: '#FFD700', fontSize: '1.2rem' }} />}
+                                        label={`${restaurant.rating}`}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            color: 'text.primary',
+                                            fontWeight: 700,
+                                            fontSize: '1.1rem',
+                                            px: 2,
+                                            py: 1,
+                                            borderRadius: '4px',
+                                            mb: 1,
+                                            border: '1px solid #e0e0e0'
+                                        }}
+                                    />
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Rating
+                                    </Typography>
+                                </Box>
                             </Grid>
-                        </Fade>
+                            <Grid item xs={6} sm={3}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                    <Chip
+                                        icon={<AccessTime sx={{ color: '#1a1a1a', fontSize: '1.2rem' }} />}
+                                        label={restaurant.deliveryTime}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            color: 'text.primary',
+                                            fontWeight: 700,
+                                            fontSize: '1.1rem',
+                                            px: 2,
+                                            py: 1,
+                                            borderRadius: '4px',
+                                            mb: 1,
+                                            border: '1px solid #e0e0e0'
+                                        }}
+                                    />
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Delivery Time
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6} sm={3}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                    <Chip
+                                        icon={<DeliveryDining sx={{ color: '#4CAF50', fontSize: '1.2rem' }} />}
+                                        label={`$${restaurant.minOrder}+`}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            color: 'text.primary',
+                                            fontWeight: 700,
+                                            fontSize: '1.1rem',
+                                            px: 2,
+                                            py: 1,
+                                            borderRadius: '4px',
+                                            mb: 1,
+                                            border: '1px solid #e0e0e0'
+                                        }}
+                                    />
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Min Order
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6} sm={3}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                    <Chip
+                                        icon={<RestaurantIcon sx={{ color: '#FFC107', fontSize: '1.2rem' }} />}
+                                        label={restaurant.cuisine || 'Various'}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            color: 'text.primary',
+                                            fontWeight: 700,
+                                            fontSize: '1.1rem',
+                                            px: 2,
+                                            py: 1,
+                                            borderRadius: '4px',
+                                            mb: 1,
+                                            border: '1px solid #e0e0e0'
+                                        }}
+                                    />
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Cuisine
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
 
                         {/* Action Buttons */}
-                        <Fade in={true} timeout={1400}>
-                            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    startIcon={<RestaurantIcon />}
-                                    onClick={() => setActiveTab(0)}
-                                    sx={{
-                                        bgcolor: darkMode
-                                            ? 'linear-gradient(45deg, #0ea5e9 30%, #ec4899 90%)'
-                                            : 'linear-gradient(45deg, #0ea5e9 30%, #ec4899 90%)',
-                                        color: 'white',
-                                        fontWeight: 700,
-                                        px: 4,
-                                        py: 1.5,
-                                        borderRadius: 50,
-                                        boxShadow: darkMode
-                                            ? '0 8px 25px rgba(14, 165, 233, 0.3)'
-                                            : '0 8px 25px rgba(14, 165, 233, 0.4)',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: darkMode
-                                                ? '0 12px 35px rgba(14, 165, 233, 0.4)'
-                                                : '0 12px 35px rgba(14, 165, 233, 0.6)'
-                                        },
-                                        transition: 'all 0.3s ease'
-                                    }}
-                                >
-                                    View Menu
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    startIcon={<LocationOn />}
-                                    sx={{
-                                        color: darkMode ? 'white' : 'primary.main',
-                                        borderColor: darkMode ? 'rgba(255,255,255,0.3)' : 'primary.main',
-                                        borderWidth: 2,
-                                        px: 4,
-                                        py: 1.5,
-                                        borderRadius: 50,
-                                        fontWeight: 600,
-                                        '&:hover': {
-                                            borderColor: darkMode ? 'white' : 'primary.dark',
-                                            bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(14, 165, 233, 0.1)',
-                                            transform: 'translateY(-2px)'
-                                        },
-                                        transition: 'all 0.3s ease'
-                                    }}
-                                >
-                                    Get Directions
-                                </Button>
-                            </Box>
-                        </Fade>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                            <Button
+                                variant="contained"
+                                size="large"
+                                startIcon={<RestaurantIcon />}
+                                onClick={() => setActiveTab(0)}
+                                sx={{
+                                    borderRadius: '4px',
+                                    px: 4,
+                                    py: 1.5,
+                                    fontWeight: 700,
+                                    fontSize: '1rem'
+                                }}
+                            >
+                                View Menu
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                startIcon={<LocationOn />}
+                                sx={{
+                                    color: 'text.primary',
+                                    borderColor: '#e0e0e0',
+                                    borderWidth: 2,
+                                    px: 4,
+                                    py: 1.5,
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                    '&:hover': {
+                                        borderColor: 'text.primary',
+                                        bgcolor: 'background.paper'
+                                    }
+                                }}
+                            >
+                                Get Directions
+                            </Button>
+                        </Box>
                     </Box>
                     
                     {/* Restaurant Image Card */}
@@ -520,36 +438,30 @@ const RestaurantDetails: React.FC = () => {
                         alignItems: 'center',
                         mt: { xs: 4, md: 0 }
                     }}>
-                        <Fade in={true} timeout={1600}>
-                            <Card sx={{
-                                width: { xs: 250, md: 300 },
-                                height: { xs: 250, md: 300 },
-                                borderRadius: 6,
-                                overflow: 'hidden',
-                                boxShadow: darkMode
-                                    ? '0 20px 60px rgba(0,0,0,0.5)'
-                                    : '0 20px 60px rgba(0,0,0,0.2)',
-                                border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'scale(1.05)',
-                                    boxShadow: darkMode
-                                        ? '0 25px 80px rgba(0,0,0,0.6)'
-                                        : '0 25px 80px rgba(0,0,0,0.3)'
-                                }
-                            }}>
-                                <CardMedia
-                                    component="img"
-                                    height="100%"
-                                    image={restaurant.imageUrl}
-                                    alt={restaurant.name}
-                                    sx={{
-                                        objectFit: 'cover',
-                                        transition: 'transform 0.3s ease'
-                                    }}
-                                />
-                            </Card>
-                        </Fade>
+                        <Card sx={{
+                            width: { xs: 200, md: 250 },
+                            height: { xs: 200, md: 250 },
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            boxShadow: 'none',
+                            border: '1px solid #e0e0e0',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                                borderColor: 'text.primary'
+                            }
+                        }}>
+                            <CardMedia
+                                component="img"
+                                height="100%"
+                                image={restaurant.imageUrl}
+                                alt={restaurant.name}
+                                sx={{
+                                    objectFit: 'cover',
+                                    transition: 'transform 0.3s ease'
+                                }}
+                            />
+                        </Card>
                     </Box>
                 </Container>
             </Box>
@@ -557,13 +469,11 @@ const RestaurantDetails: React.FC = () => {
             <Container maxWidth="xl" sx={{ mt: 4, position: 'relative', zIndex: 10, pb: 8 }}>
                 {/* Restaurant Info Section */}
                 <Paper sx={{
-                    borderRadius: 4,
+                    borderRadius: '8px',
                     overflow: 'hidden',
-                    boxShadow: darkMode
-                        ? '0 20px 60px rgba(0,0,0,0.5)'
-                        : '0 20px 60px rgba(0,0,0,0.1)',
-                    bgcolor: darkMode ? '#1a1a2e' : 'white',
-                    border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    boxShadow: 'none',
+                    bgcolor: 'background.paper',
+                    border: '1px solid #e0e0e0',
                     mb: 4
                 }}>
                     <Box sx={{ p: { xs: 3, md: 4 } }}>
@@ -573,40 +483,40 @@ const RestaurantDetails: React.FC = () => {
                             gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
                             gap: 3,
                             mb: 4,
-                            borderBottom: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
+                            borderBottom: '1px solid #e0e0e0',
                             pb: 4
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Info sx={{ color: darkMode ? 'primary.main' : 'primary.dark', fontSize: '1.5rem' }} />
+                                <RestaurantIcon sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled', mb: 0.5 }}>
+                                    <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                                         Address
                                     </Typography>
-                                    <Typography variant="body1" fontWeight="medium" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
+                                    <Typography variant="body1" fontWeight="medium" sx={{ color: 'text.primary' }}>
                                         {restaurant.address}
                                     </Typography>
                                 </Box>
                             </Box>
                             
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Phone sx={{ color: darkMode ? 'primary.main' : 'primary.dark', fontSize: '1.5rem' }} />
+                                <RestaurantIcon sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled', mb: 0.5 }}>
+                                    <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                                         Phone
                                     </Typography>
-                                    <Typography variant="body1" fontWeight="medium" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
+                                    <Typography variant="body1" fontWeight="medium" sx={{ color: 'text.primary' }}>
                                         {restaurant.phone || 'Not available'}
                                     </Typography>
                                 </Box>
                             </Box>
                             
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Schedule sx={{ color: darkMode ? 'primary.main' : 'primary.dark', fontSize: '1.5rem' }} />
+                                <RestaurantIcon sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ color: darkMode ? 'text.secondary' : 'text.disabled', mb: 0.5 }}>
+                                    <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                                         Hours
                                     </Typography>
-                                    <Typography variant="body1" fontWeight="medium" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
+                                    <Typography variant="body1" fontWeight="medium" sx={{ color: 'text.primary' }}>
                                         {restaurant.hours && restaurant.hours.length > 0
                                             ? `${restaurant.hours[0].openTime} - ${restaurant.hours[0].closeTime}`
                                             : 'Not available'}
@@ -617,12 +527,12 @@ const RestaurantDetails: React.FC = () => {
                         
                         {/* Restaurant Description */}
                         <Box sx={{ mb: 4 }}>
-                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: darkMode ? 'white' : 'text.primary' }}>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: 'text.primary' }}>
                                 About {restaurant.name}
                             </Typography>
                             <Typography variant="body1" sx={{
                                 lineHeight: 1.8,
-                                color: darkMode ? 'text.secondary' : 'text.primary'
+                                color: 'text.secondary'
                             }}>
                                 {restaurant.description || 'A delicious dining experience awaits you at our restaurant.'}
                             </Typography>
@@ -632,34 +542,32 @@ const RestaurantDetails: React.FC = () => {
                 
                 {/* Main Content Tabs */}
                 <Paper sx={{
-                    borderRadius: 4,
+                    borderRadius: '8px',
                     overflow: 'hidden',
-                    boxShadow: darkMode
-                        ? '0 20px 60px rgba(0,0,0,0.5)'
-                        : '0 20px 60px rgba(0,0,0,0.1)',
-                    bgcolor: darkMode ? '#1a1a2e' : 'white',
-                    border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
+                    boxShadow: 'none',
+                    bgcolor: 'background.paper',
+                    border: '1px solid #e0e0e0'
                 }}>
                     <Tabs
                         value={activeTab}
                         onChange={(_, newValue) => setActiveTab(newValue)}
                         sx={{
                             borderBottom: 1,
-                            borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'divider',
-                            bgcolor: darkMode ? '#16213e' : 'grey.50',
+                            borderColor: '#e0e0e0',
+                            bgcolor: 'background.paper',
                             '& .MuiTab-root': {
                                 fontWeight: 600,
                                 fontSize: '1rem',
                                 py: 2,
                                 px: 4,
                                 minHeight: 64,
-                                color: darkMode ? 'text.secondary' : 'text.primary'
+                                color: 'text.primary'
                             },
                             '& .Mui-selected': {
-                                color: darkMode ? 'primary.main' : 'primary.dark'
+                                color: 'primary.main'
                             },
                             '& .MuiTabs-indicator': {
-                                backgroundColor: darkMode ? 'primary.main' : 'primary.dark'
+                                backgroundColor: 'primary.main'
                             }
                         }}
                     >
@@ -682,242 +590,215 @@ const RestaurantDetails: React.FC = () => {
                                 <Box sx={{
                                     textAlign: 'center',
                                     py: 8,
-                                    bgcolor: darkMode ? '#16213e' : 'grey.50',
-                                    borderRadius: 3,
-                                    border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
+                                    bgcolor: 'background.paper',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e0e0e0'
                                 }}>
                                     <RestaurantIcon sx={{
                                         fontSize: 64,
-                                        color: darkMode ? 'grey.500' : 'grey.400',
+                                        color: 'grey.400',
                                         mb: 2
                                     }} />
                                     <Typography variant="h6" sx={{
-                                        color: darkMode ? 'text.secondary' : 'text.secondary',
+                                        color: 'text.secondary',
                                         mb: 1
                                     }}>
                                         No items available yet
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: darkMode ? 'text.disabled' : 'text.disabled' }}>
+                                    <Typography variant="body2" sx={{ color: 'text.disabled' }}>
                                         Check back later for delicious offerings!
                                     </Typography>
                                 </Box>
                             ) : (
                                 <Box>
                                     {categories.map((category, categoryIndex) => (
-                                        <Fade in={true} timeout={800 + categoryIndex * 200} key={category}>
-                                            <Box sx={{ mb: 6 }}>
-                                                <Typography
-                                                    variant="h4"
-                                                    sx={{
-                                                        fontWeight: 800,
-                                                        mb: 4,
-                                                        color: darkMode ? 'white' : 'primary.main',
-                                                        position: 'relative',
-                                                        '&::after': {
-                                                            content: '""',
-                                                            position: 'absolute',
-                                                            bottom: -8,
-                                                            left: 0,
-                                                            width: 60,
-                                                            height: 4,
-                                                            bgcolor: darkMode ? 'primary.main' : 'primary.main',
-                                                            borderRadius: 2
-                                                        }
-                                                    }}
-                                                >
-                                                    {category}
-                                                </Typography>
+                                        <Box sx={{ mb: 6 }} key={category}>
+                                            <Typography
+                                                variant="h4"
+                                                sx={{
+                                                    fontWeight: 800,
+                                                    mb: 4,
+                                                    color: 'text.primary',
+                                                    position: 'relative',
+                                                    '&::after': {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        bottom: -8,
+                                                        left: 0,
+                                                        width: 60,
+                                                        height: 4,
+                                                        bgcolor: 'primary.main',
+                                                        borderRadius: 2
+                                                    }
+                                                }}
+                                            >
+                                                {category}
+                                            </Typography>
 
-                                                <Grid container spacing={3}>
-                                                    {groupedProducts[category].map((product, index) => (
-                                                        <Grid item xs={12} md={6} key={product._id}>
-                                                            <Slide direction="up" in={true} timeout={1000 + index * 100}>
-                                                                <Card sx={{
-                                                                    borderRadius: 4,
-                                                                    overflow: 'hidden',
-                                                                    boxShadow: darkMode
-                                                                                        ? '0 8px 25px rgba(0,0,0,0.3)'
-                                                                                        : '0 8px 25px rgba(0,0,0,0.08)',
-                                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                                    cursor: 'pointer',
-                                                                    position: 'relative',
-                                                                    '&:hover': {
-                                                                        transform: 'translateY(-8px)',
-                                                                        boxShadow: darkMode
-                                                                                            ? '0 20px 40px rgba(0,0,0,0.4)'
-                                                                                            : '0 20px 40px rgba(0,0,0,0.15)'
-                                                                    },
-                                                                    bgcolor: darkMode ? '#1a1a2e' : 'white',
-                                                                    border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
-                                                                }}>
-                                                                    <Box sx={{ position: 'relative' }}>
-                                                                        <CardMedia
-                                                                            component="img"
-                                                                            height="200"
-                                                                            image={product.image}
-                                                                            alt={product.name}
+                                            <Grid container spacing={3}>
+                                                {groupedProducts[category].map((product, index) => (
+                                                    <Grid item xs={12} md={6} key={product._id}>
+                                                        <Card sx={{
+                                                            borderRadius: '8px',
+                                                            overflow: 'hidden',
+                                                            boxShadow: 'none',
+                                                            border: '1px solid #e0e0e0',
+                                                            transition: 'all 0.3s ease',
+                                                            cursor: 'pointer',
+                                                            position: 'relative',
+                                                            '&:hover': {
+                                                                transform: 'translateY(-4px)',
+                                                                borderColor: 'text.primary'
+                                                            },
+                                                            bgcolor: 'background.paper'
+                                                        }}>
+                                                            <Box sx={{ position: 'relative' }}>
+                                                                <CardMedia
+                                                                    component="img"
+                                                                    height="200"
+                                                                    image={product.image}
+                                                                    alt={product.name}
+                                                                    sx={{
+                                                                        objectFit: 'cover',
+                                                                        transition: 'transform 0.3s ease',
+                                                                        '&:hover': { transform: 'scale(1.05)' }
+                                                                    }}
+                                                                />
+                                                                
+                                                                {product.isAvailable ? (
+                                                                    <Chip
+                                                                        label="Available"
+                                                                        sx={{
+                                                                            position: 'absolute',
+                                                                            top: 12,
+                                                                            left: 12,
+                                                                            bgcolor: 'success.main',
+                                                                            color: 'white',
+                                                                            fontWeight: 600
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <Chip
+                                                                        label="Unavailable"
+                                                                        sx={{
+                                                                            position: 'absolute',
+                                                                            top: 12,
+                                                                            left: 12,
+                                                                            bgcolor: 'error.main',
+                                                                            color: 'white',
+                                                                            fontWeight: 600
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Box>
+
+                                                            <CardContent sx={{ p: 3 }}>
+                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                                    <Box sx={{ flex: 1 }}>
+                                                                        <Typography
+                                                                            variant="h6"
                                                                             sx={{
-                                                                                objectFit: 'cover',
-                                                                                transition: 'transform 0.3s ease',
-                                                                                '&:hover': { transform: 'scale(1.05)' }
-                                                                            }}
-                                                                        />
-                                                                        <IconButton
-                                                                            onClick={() => toggleFavorite(product._id || '')}
-                                                                            sx={{
-                                                                                position: 'absolute',
-                                                                                top: 12,
-                                                                                right: 12,
-                                                                                bgcolor: darkMode ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.9)',
-                                                                                backdropFilter: 'blur(10px)',
-                                                                                '&:hover': {
-                                                                                    bgcolor: darkMode ? 'rgba(255,255,255,0.3)' : 'white'
-                                                                                }
+                                                                                fontWeight: 700,
+                                                                                mb: 1,
+                                                                                lineHeight: 1.3,
+                                                                                color: 'text.primary'
                                                                             }}
                                                                         >
-                                                                            {favorites.has(product._id || '') ? (
-                                                                                <Favorite sx={{ color: 'error.main' }} />
-                                                                            ) : (
-                                                                                <FavoriteBorder sx={{ color: darkMode ? 'white' : 'grey.600' }} />
-                                                                            )}
-                                                                        </IconButton>
+                                                                            {product.name}
+                                                                        </Typography>
+                                                                        <Typography
+                                                                            variant="body2"
+                                                                            sx={{
+                                                                                display: '-webkit-box',
+                                                                                WebkitLineClamp: 2,
+                                                                                WebkitBoxOrient: 'vertical',
+                                                                                overflow: 'hidden',
+                                                                                lineHeight: 1.4,
+                                                                                color: 'text.secondary'
+                                                                            }}
+                                                                        >
+                                                                            {product.description}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    <Typography
+                                                                        variant="h5"
+                                                                        sx={{
+                                                                            fontWeight: 800,
+                                                                            color: 'primary.main',
+                                                                            ml: 2
+                                                                        }}
+                                                                    >
+                                                                        ${product.price.toFixed(2)}
+                                                                    </Typography>
+                                                                </Box>
 
-                                                                        {product.isAvailable ? (
-                                                                            <Chip
-                                                                                label="Available"
-                                                                                sx={{
-                                                                                    position: 'absolute',
-                                                                                    top: 12,
-                                                                                    left: 12,
-                                                                                    bgcolor: 'success.main',
-                                                                                    color: 'white',
-                                                                                    fontWeight: 600
-                                                                                }}
-                                                                            />
-                                                                        ) : (
-                                                                            <Chip
-                                                                                label="Unavailable"
-                                                                                sx={{
-                                                                                    position: 'absolute',
-                                                                                    top: 12,
-                                                                                    left: 12,
-                                                                                    bgcolor: 'error.main',
-                                                                                    color: 'white',
-                                                                                    fontWeight: 600
-                                                                                }}
-                                                                            />
-                                                                        )}
+                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                        <LocalOffer sx={{
+                                                                            fontSize: 16,
+                                                                            color: 'text.secondary'
+                                                                        }} />
+                                                                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                            {product.category}
+                                                                        </Typography>
                                                                     </Box>
 
-                                                                    <CardContent sx={{ p: 3 }}>
-                                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                                                            <Box sx={{ flex: 1 }}>
-                                                                                <Typography
-                                                                                    variant="h6"
-                                                                                    sx={{
-                                                                                        fontWeight: 700,
-                                                                                        mb: 1,
-                                                                                        lineHeight: 1.3,
-                                                                                        color: darkMode ? 'white' : 'text.primary'
-                                                                                    }}
+                                                                    {(() => {
+                                                                        const cartItem = cart.items.find(item => item._id === product._id);
+                                                                        return cartItem ? (
+                                                                            <Box sx={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                bgcolor: 'primary.main',
+                                                                                borderRadius: '4px',
+                                                                                px: 1
+                                                                            }}>
+                                                                                <IconButton
+                                                                                    size="small"
+                                                                                    onClick={() => dispatch(removeFromCart(product._id || ''))}
+                                                                                    sx={{ color: 'white', p: 0.5 }}
                                                                                 >
-                                                                                    {product.name}
+                                                                                    <Remove fontSize="small" />
+                                                                                </IconButton>
+                                                                                <Typography sx={{ mx: 1, color: 'white', fontWeight: 600 }}>
+                                                                                    {cartItem.quantity}
                                                                                 </Typography>
-                                                                                <Typography
-                                                                                    variant="body2"
-                                                                                    sx={{
-                                                                                        display: '-webkit-box',
-                                                                                        WebkitLineClamp: 2,
-                                                                                        WebkitBoxOrient: 'vertical',
-                                                                                        overflow: 'hidden',
-                                                                                        lineHeight: 1.4,
-                                                                                        color: darkMode ? 'text.secondary' : 'text.secondary'
-                                                                                    }}
+                                                                                <IconButton
+                                                                                    size="small"
+                                                                                    onClick={() => dispatch(addToCart({ product, restaurantId: restaurant._id || '' }))}
+                                                                                    sx={{ color: 'white', p: 0.5 }}
                                                                                 >
-                                                                                    {product.description}
-                                                                                </Typography>
+                                                                                    <Add fontSize="small" />
+                                                                                </IconButton>
                                                                             </Box>
-                                                                            <Typography
-                                                                                variant="h5"
+                                                                        ) : (
+                                                                            <Button
+                                                                                variant="contained"
+                                                                                size="small"
+                                                                                onClick={() => dispatch(addToCart({ product, restaurantId: restaurant._id || '' }))}
+                                                                                disabled={!product.isAvailable}
                                                                                 sx={{
-                                                                                    fontWeight: 800,
-                                                                                    color: darkMode ? 'primary.main' : 'primary.main',
-                                                                                    ml: 2
+                                                                                    borderRadius: '4px',
+                                                                                    px: 3,
+                                                                                    fontWeight: 600,
+                                                                                    textTransform: 'none',
+                                                                                    bgcolor: 'primary.main',
+                                                                                    '&:hover': {
+                                                                                        bgcolor: 'primary.dark'
+                                                                                    }
                                                                                 }}
                                                                             >
-                                                                                ${product.price.toFixed(2)}
-                                                                            </Typography>
-                                                                        </Box>
-
-                                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                                <LocalOffer sx={{
-                                                                                    fontSize: 16,
-                                                                                    color: darkMode ? 'text.secondary' : 'text.secondary'
-                                                                                }} />
-                                                                                <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.secondary' }}>
-                                                                                    {product.category}
-                                                                                </Typography>
-                                                                            </Box>
-
-                                                                            {(() => {
-                                                                                const cartItem = cart.items.find(item => item._id === product._id);
-                                                                                return cartItem ? (
-                                                                                    <Box sx={{
-                                                                                        display: 'flex',
-                                                                                        alignItems: 'center',
-                                                                                        bgcolor: darkMode ? 'primary.main' : 'primary.main',
-                                                                                        borderRadius: 20,
-                                                                                        px: 1
-                                                                                    }}>
-                                                                                        <IconButton
-                                                                                            size="small"
-                                                                                            onClick={() => dispatch(removeFromCart(product._id || ''))}
-                                                                                            sx={{ color: 'white', p: 0.5 }}
-                                                                                        >
-                                                                                            <Remove fontSize="small" />
-                                                                                        </IconButton>
-                                                                                        <Typography sx={{ mx: 1, color: 'white', fontWeight: 600 }}>
-                                                                                            {cartItem.quantity}
-                                                                                        </Typography>
-                                                                                        <IconButton
-                                                                                            size="small"
-                                                                                            onClick={() => dispatch(addToCart({ product, restaurantId: restaurant._id || '' }))}
-                                                                                            sx={{ color: 'white', p: 0.5 }}
-                                                                                        >
-                                                                                            <Add fontSize="small" />
-                                                                                        </IconButton>
-                                                                                    </Box>
-                                                                                ) : (
-                                                                                    <Button
-                                                                                        variant="contained"
-                                                                                        size="small"
-                                                                                        onClick={() => dispatch(addToCart({ product, restaurantId: restaurant._id || '' }))}
-                                                                                        disabled={!product.isAvailable}
-                                                                                        sx={{
-                                                                                            borderRadius: 20,
-                                                                                            px: 3,
-                                                                                            fontWeight: 600,
-                                                                                            textTransform: 'none',
-                                                                                            bgcolor: darkMode ? 'primary.main' : 'primary.main',
-                                                                                            '&:hover': {
-                                                                                                bgcolor: darkMode ? 'primary.dark' : 'primary.dark'
-                                                                                            }
-                                                                                        }}
-                                                                                    >
-                                                                                        Add to Cart
-                                                                                    </Button>
-                                                                                );
-                                                                            })()}
-                                                                        </Box>
-                                                                    </CardContent>
-                                                                </Card>
-                                                            </Slide>
-                                                        </Grid>
-                                                    ))}
-                                                </Grid>
-                                            </Box>
-                                        </Fade>
+                                                                                Add to Cart
+                                                                            </Button>
+                                                                        );
+                                                                    })()}
+                                                                </Box>
+                                                            </CardContent>
+                                                        </Card>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        </Box>
                                     ))}
                                 </Box>
                             )}
@@ -929,7 +810,7 @@ const RestaurantDetails: React.FC = () => {
                         <Box sx={{ p: { xs: 3, md: 4 } }}>
                             <Typography variant="h4" fontWeight="bold" gutterBottom sx={{
                                 mb: 4,
-                                color: darkMode ? 'white' : 'text.primary'
+                                color: 'text.primary'
                             }}>
                                 Customer Reviews ({totalReviews})
                             </Typography>
@@ -938,230 +819,223 @@ const RestaurantDetails: React.FC = () => {
                                 <Paper sx={{
                                     p: 6,
                                     textAlign: 'center',
-                                    borderRadius: 4,
-                                    bgcolor: darkMode ? '#16213e' : 'grey.50',
-                                    border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '2px dashed',
-                                    borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'grey.300'
+                                    borderRadius: '8px',
+                                    bgcolor: 'background.paper',
+                                    border: '1px solid #e0e0e0',
+                                    borderColor: '#e0e0e0'
                                 }}>
                                     <Comment sx={{
                                         fontSize: 64,
-                                        color: darkMode ? 'grey.500' : 'grey.400',
+                                        color: 'grey.400',
                                         mb: 2
                                     }} />
                                     <Typography variant="h6" sx={{
-                                        color: darkMode ? 'text.secondary' : 'text.secondary',
+                                        color: 'text.secondary',
                                         mb: 1
                                     }}>
                                         No reviews yet
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: darkMode ? 'text.disabled' : 'text.disabled' }}>
+                                    <Typography variant="body2" sx={{ color: 'text.disabled' }}>
                                         Be the first to review this restaurant!
                                     </Typography>
                                 </Paper>
                             ) : (
                                 <>
                                     {reviews.map((review, index) => (
-                                        <Fade in={true} timeout={800 + index * 100} key={review._id}>
-                                            <Paper sx={{
-                                                p: 4,
-                                                mb: 3,
-                                                borderRadius: 4,
-                                                boxShadow: darkMode
-                                                    ? '0 8px 25px rgba(0,0,0,0.3)'
-                                                    : '0 8px 25px rgba(0,0,0,0.08)',
-                                                border: '1px solid',
-                                                borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'grey.100',
-                                                transition: 'all 0.3s ease',
-                                                '&:hover': {
-                                                    boxShadow: darkMode
-                                                        ? '0 12px 35px rgba(0,0,0,0.4)'
-                                                        : '0 12px 35px rgba(0,0,0,0.12)',
-                                                    transform: 'translateY(-2px)'
-                                                },
-                                                bgcolor: darkMode ? '#1a1a2e' : 'white'
-                                            }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                                        <Avatar sx={{
-                                                            bgcolor: darkMode ? 'primary.main' : 'primary.main',
-                                                            width: 50,
-                                                            height: 50,
-                                                            fontSize: '1.2rem',
-                                                            fontWeight: 700
-                                                        }}>
-                                                            {review.user.firstName[0]}{review.user.lastName[0]}
-                                                        </Avatar>
-                                                        <Box>
-                                                            <Typography variant="h6" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                                                                {review.user.firstName} {review.user.lastName}
-                                                            </Typography>
-                                                            <Typography variant="body2" sx={{ color: darkMode ? 'text.secondary' : 'text.secondary' }}>
-                                                                {formatDate(review.createdAt)}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <Rating value={review.rating} readOnly size="small" sx={{ color: darkMode ? 'primary.main' : 'primary.main' }} />
-                                                        <Typography variant="body2" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                                                            {review.rating}/5
+                                        <Paper sx={{
+                                            p: 4,
+                                            mb: 3,
+                                            borderRadius: '8px',
+                                            boxShadow: 'none',
+                                            border: '1px solid #e0e0e0',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                                borderColor: 'text.primary',
+                                                transform: 'translateY(-2px)'
+                                            },
+                                            bgcolor: 'background.paper'
+                                        }} key={review._id}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                                    <Avatar sx={{
+                                                        bgcolor: 'primary.main',
+                                                        width: 50,
+                                                        height: 50,
+                                                        fontSize: '1.2rem',
+                                                        fontWeight: 700
+                                                    }}>
+                                                        {review.user.firstName[0]}{review.user.lastName[0]}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary' }}>
+                                                            {review.user.firstName} {review.user.lastName}
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                            {formatDate(review.createdAt)}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
-
-                                                {/* Detailed Ratings */}
-                                                {(review.foodRating || review.serviceRating || review.deliveryRating) && (
-                                                    <Box sx={{
-                                                        display: 'flex',
-                                                        gap: 4,
-                                                        mb: 3,
-                                                        p: 3,
-                                                        bgcolor: darkMode ? '#16213e' : 'grey.50',
-                                                        borderRadius: 3,
-                                                        flexWrap: 'wrap',
-                                                        border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
-                                                    }}>
-                                                        {review.foodRating && (
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <Typography variant="caption" sx={{
-                                                                    color: darkMode ? 'text.secondary' : 'text.secondary',
-                                                                    display: 'block'
-                                                                }}>
-                                                                    Food Quality
-                                                                </Typography>
-                                                                <Rating value={review.foodRating} readOnly size="small" sx={{ color: darkMode ? 'primary.main' : 'primary.main' }} />
-                                                                <Typography variant="caption" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                                                                    {review.foodRating}/5
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                        {review.serviceRating && (
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <Typography variant="caption" sx={{
-                                                                    color: darkMode ? 'text.secondary' : 'text.secondary',
-                                                                    display: 'block'
-                                                                }}>
-                                                                    Service
-                                                                </Typography>
-                                                                <Rating value={review.serviceRating} readOnly size="small" sx={{ color: darkMode ? 'primary.main' : 'primary.main' }} />
-                                                                <Typography variant="caption" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                                                                    {review.serviceRating}/5
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                        {review.deliveryRating && (
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <Typography variant="caption" sx={{
-                                                                    color: darkMode ? 'text.secondary' : 'text.secondary',
-                                                                    display: 'block'
-                                                                }}>
-                                                                    Delivery
-                                                                </Typography>
-                                                                <Rating value={review.deliveryRating} readOnly size="small" sx={{ color: darkMode ? 'primary.main' : 'primary.main' }} />
-                                                                <Typography variant="caption" fontWeight="bold" sx={{ color: darkMode ? 'white' : 'text.primary' }}>
-                                                                    {review.deliveryRating}/5
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                    </Box>
-                                                )}
-
-                                                {review.comment && (
-                                                    <Typography variant="body1" sx={{
-                                                        mb: 3,
-                                                        lineHeight: 1.6,
-                                                        color: darkMode ? 'text.secondary' : 'text.primary',
-                                                        fontStyle: 'italic'
-                                                    }}>
-                                                        "{review.comment}"
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Rating value={review.rating} readOnly size="small" sx={{ color: 'primary.main' }} />
+                                                    <Typography variant="body2" fontWeight="bold" sx={{ color: 'text.primary' }}>
+                                                        {review.rating}/5
                                                     </Typography>
-                                                )}
+                                                </Box>
+                                            </Box>
 
-                                                {/* Photos */}
-                                                {review.photos && review.photos.length > 0 && (
-                                                    <Box sx={{ mb: 3 }}>
-                                                        <Typography variant="subtitle2" sx={{
-                                                            mb: 2,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 1,
-                                                            color: darkMode ? 'white' : 'text.primary'
-                                                        }}>
-                                                            <Photo fontSize="small" />
-                                                            Photos ({review.photos.length})
-                                                        </Typography>
-                                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                                            {review.photos.slice(0, 4).map((photo, photoIndex) => (
-                                                                <Box
-                                                                    key={photoIndex}
-                                                                    component="img"
-                                                                    src={photo}
-                                                                    sx={{
-                                                                        width: 80,
-                                                                        height: 80,
-                                                                        borderRadius: 2,
-                                                                        objectFit: 'cover',
-                                                                        cursor: 'pointer',
-                                                                        transition: 'transform 0.2s ease',
-                                                                        '&:hover': { transform: 'scale(1.05)' },
-                                                                        border: darkMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
-                                                                    }}
-                                                                />
-                                                            ))}
-                                                        </Box>
-                                                    </Box>
-                                                )}
-
-                                                {/* Restaurant Response */}
-                                                {review.restaurantResponse && (
-                                                    <Box sx={{
-                                                        mt: 3,
-                                                        p: 3,
-                                                        bgcolor: darkMode ? 'rgba(14, 165, 233, 0.1)' : 'primary.50',
-                                                        borderRadius: 3,
-                                                        border: '1px solid',
-                                                        borderColor: darkMode ? 'rgba(14, 165, 233, 0.2)' : 'primary.200'
-                                                    }}>
-                                                        <Typography variant="subtitle2" fontWeight="bold" sx={{
-                                                            color: darkMode ? 'primary.main' : 'primary.main',
-                                                            mb: 1
-                                                        }}>
-                                                            Response from {restaurant.name}
-                                                        </Typography>
-                                                        <Typography variant="body2" sx={{
-                                                            mb: 1,
-                                                            color: darkMode ? 'white' : 'text.primary'
-                                                        }}>
-                                                            {review.restaurantResponse.comment}
-                                                        </Typography>
-                                                        <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.secondary' }}>
-                                                            {formatDate(review.restaurantResponse.respondedAt)}
-                                                        </Typography>
-                                                    </Box>
-                                                )}
-
-                                                {/* Helpful Count */}
+                                            {/* Detailed Ratings */}
+                                            {(review.foodRating || review.serviceRating || review.deliveryRating) && (
                                                 <Box sx={{
                                                     display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    mt: 3,
-                                                    pt: 3,
-                                                    borderTop: '1px solid',
-                                                    borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'grey.200'
+                                                    gap: 4,
+                                                    mb: 3,
+                                                    p: 3,
+                                                    bgcolor: 'background.paper',
+                                                    borderRadius: '8px',
+                                                    flexWrap: 'wrap',
+                                                    border: '1px solid #e0e0e0'
                                                 }}>
-                                                    <Button
-                                                        startIcon={<ThumbUp />}
-                                                        size="small"
-                                                        sx={{ color: darkMode ? 'text.secondary' : 'text.secondary' }}
-                                                    >
-                                                        Helpful ({review.helpfulCount})
-                                                    </Button>
-                                                    <Typography variant="caption" sx={{ color: darkMode ? 'text.secondary' : 'text.secondary' }}>
-                                                        Verified Review
+                                                    {review.foodRating && (
+                                                        <Box sx={{ textAlign: 'center' }}>
+                                                            <Typography variant="caption" sx={{
+                                                                color: 'text.secondary',
+                                                                display: 'block'
+                                                            }}>
+                                                                Food Quality
+                                                            </Typography>
+                                                            <Rating value={review.foodRating} readOnly size="small" sx={{ color: 'primary.main' }} />
+                                                            <Typography variant="caption" fontWeight="bold" sx={{ color: 'text.primary' }}>
+                                                                {review.foodRating}/5
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                    {review.serviceRating && (
+                                                        <Box sx={{ textAlign: 'center' }}>
+                                                            <Typography variant="caption" sx={{
+                                                                color: 'text.secondary',
+                                                                display: 'block'
+                                                            }}>
+                                                                Service
+                                                            </Typography>
+                                                            <Rating value={review.serviceRating} readOnly size="small" sx={{ color: 'primary.main' }} />
+                                                            <Typography variant="caption" fontWeight="bold" sx={{ color: 'text.primary' }}>
+                                                                {review.serviceRating}/5
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                    {review.deliveryRating && (
+                                                        <Box sx={{ textAlign: 'center' }}>
+                                                            <Typography variant="caption" sx={{
+                                                                color: 'text.secondary',
+                                                                display: 'block'
+                                                            }}>
+                                                                Delivery
+                                                            </Typography>
+                                                            <Rating value={review.deliveryRating} readOnly size="small" sx={{ color: 'primary.main' }} />
+                                                            <Typography variant="caption" fontWeight="bold" sx={{ color: 'text.primary' }}>
+                                                                {review.deliveryRating}/5
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            )}
+
+                                            {review.comment && (
+                                                <Typography variant="body1" sx={{
+                                                    mb: 3,
+                                                    lineHeight: 1.6,
+                                                    color: 'text.secondary',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    "{review.comment}"
+                                                </Typography>
+                                            )}
+
+                                            {/* Photos */}
+                                            {review.photos && review.photos.length > 0 && (
+                                                <Box sx={{ mb: 3 }}>
+                                                    <Typography variant="subtitle2" sx={{
+                                                        mb: 2,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1,
+                                                        color: 'text.primary'
+                                                    }}>
+                                                        <Photo fontSize="small" />
+                                                        Photos ({review.photos.length})
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                                        {review.photos.slice(0, 4).map((photo, photoIndex) => (
+                                                            <Box
+                                                                key={photoIndex}
+                                                                component="img"
+                                                                src={photo}
+                                                                sx={{
+                                                                    width: 80,
+                                                                    height: 80,
+                                                                    borderRadius: '4px',
+                                                                    objectFit: 'cover',
+                                                                    cursor: 'pointer',
+                                                                    transition: 'transform 0.2s ease',
+                                                                    '&:hover': { transform: 'scale(1.05)' },
+                                                                    border: '1px solid #e0e0e0'
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            )}
+
+                                            {/* Restaurant Response */}
+                                            {review.restaurantResponse && (
+                                                <Box sx={{
+                                                    mt: 3,
+                                                    p: 3,
+                                                    bgcolor: 'primary.50',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid',
+                                                    borderColor: 'primary.200'
+                                                }}>
+                                                    <Typography variant="subtitle2" fontWeight="bold" sx={{
+                                                        color: 'primary.main',
+                                                        mb: 1
+                                                    }}>
+                                                        Response from {restaurant.name}
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{
+                                                        mb: 1,
+                                                        color: 'text.primary'
+                                                    }}>
+                                                        {review.restaurantResponse.comment}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                        {formatDate(review.restaurantResponse.respondedAt)}
                                                     </Typography>
                                                 </Box>
-                                            </Paper>
-                                        </Fade>
+                                            )}
+
+                                            {/* Helpful Count */}
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                mt: 3,
+                                                pt: 3,
+                                                borderTop: '1px solid',
+                                                borderColor: '#e0e0e0'
+                                            }}>
+                                                <Button
+                                                    startIcon={<ThumbUp />}
+                                                    size="small"
+                                                    sx={{ color: 'text.secondary' }}
+                                                >
+                                                    Helpful ({review.helpfulCount})
+                                                </Button>
+                                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                    Verified Review
+                                                </Typography>
+                                            </Box>
+                                        </Paper>
                                     ))}
 
                                     {totalReviews > 5 && (
@@ -1176,10 +1050,10 @@ const RestaurantDetails: React.FC = () => {
                                                     '& .MuiPaginationItem-root': {
                                                         fontSize: '1rem',
                                                         fontWeight: 600,
-                                                        color: darkMode ? 'white' : 'text.primary'
+                                                        color: 'text.primary'
                                                     },
                                                     '& .Mui-selected': {
-                                                        bgcolor: darkMode ? 'primary.main' : 'primary.main',
+                                                        bgcolor: 'primary.main',
                                                         color: 'white'
                                                     }
                                                 }}
@@ -1194,21 +1068,20 @@ const RestaurantDetails: React.FC = () => {
 
                 {/* Floating Cart Button */}
                 {cart.items.length > 0 && (
-                    <Fab
-                        color="primary"
+                    <Button
+                        variant="contained"
                         sx={{
                             position: 'fixed',
                             bottom: 24,
                             right: 24,
                             zIndex: 1000,
-                            width: 70,
-                            height: 70,
-                            boxShadow: darkMode
-                                ? '0 8px 25px rgba(14, 165, 233, 0.5)'
-                                : '0 8px 25px rgba(102, 126, 234, 0.4)',
-                            bgcolor: darkMode ? 'primary.main' : 'primary.main',
+                            width: 60,
+                            height: 60,
+                            borderRadius: '50%',
+                            boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4)',
+                            bgcolor: 'primary.main',
                             '&:hover': {
-                                bgcolor: darkMode ? 'primary.dark' : 'primary.dark',
+                                bgcolor: 'primary.dark',
                                 transform: 'scale(1.1)'
                             },
                             transition: 'all 0.3s ease'
@@ -1216,9 +1089,9 @@ const RestaurantDetails: React.FC = () => {
                         onClick={() => navigate('/checkout')}
                     >
                         <Badge badgeContent={cart.items.length} color="error">
-                            <ShoppingCart sx={{ fontSize: 28, color: 'white' }} />
+                            <ShoppingCart sx={{ fontSize: 24, color: 'white' }} />
                         </Badge>
-                    </Fab>
+                    </Button>
                 )}
             </Container>
         </Box>

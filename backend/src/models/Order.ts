@@ -22,6 +22,7 @@ export interface IOrder extends Document {
     subtotal?: number;
     deliveryFee?: number;
     discount?: number;
+    tipAmount?: number;
     totalAmount: number;
     status: OrderStatus;
     statusHistory: IStatusHistory[];
@@ -82,6 +83,10 @@ const orderSchema = new Schema<IOrder>({
         default: 0,
     },
     discount: {
+        type: Number,
+        default: 0,
+    },
+    tipAmount: {
         type: Number,
         default: 0,
     },
