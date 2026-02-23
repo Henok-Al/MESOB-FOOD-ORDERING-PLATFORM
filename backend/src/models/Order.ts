@@ -44,9 +44,25 @@ export interface IOrder extends Document {
     actualDeliveryTime?: Date;
     preparationTime?: number;
     customerNotes?: string;
-    driverNotes?: string;
-    cancellationReason?: string;
-    driver?: mongoose.Schema.Types.ObjectId;
+    driverNotes: String;
+    cancellationReason: String;
+    driver: mongoose.Schema.Types.ObjectId;
+    driverTip?: {
+        amount: number;
+        paymentMethod: string;
+        tippedAt: Date;
+    };
+    scheduledDelivery?: {
+        date: Date;
+        timeWindow: string;
+    };
+    isGroupOrder: boolean;
+    groupOrderId?: string;
+    dietaryPreferences?: string[];
+    isPreset: boolean;
+    presetName?: string;
+    orderType: 'delivery' | 'pickup' | 'dine-in';
+    tableNumber?: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -163,6 +179,32 @@ const orderSchema = new Schema<IOrder>({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
+    driverTip: {
+        amount: Number,
+        paymentMethod: String,
+        tippedAt: Date,
+    },
+    scheduledDelivery: {
+        date: Date,
+        timeWindow: String,
+    },
+    isGroupOrder: {
+        type: Boolean,
+        default: false,
+    },
+    groupOrderId: String,
+    dietaryPreferences: [String],
+    isPreset: {
+        type: Boolean,
+        default: false,
+    },
+    presetName: String,
+    orderType: {
+        type: String,
+        enum: ['delivery', 'pickup', 'dine-in'],
+        default: 'delivery',
+    },
+    tableNumber: Number,
     createdAt: {
         type: Date,
         default: Date.now,

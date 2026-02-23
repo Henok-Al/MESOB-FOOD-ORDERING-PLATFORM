@@ -20,8 +20,15 @@ import {
     StepLabel,
     InputAdornment,
     Switch,
+    FormControl,
+    Checkbox,
+    Collapse,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
-import { LocalOffer, InfoOutlined, ShieldOutlined } from '@mui/icons-material';
+import { LocalOffer, InfoOutlined, ShieldOutlined, AccountBalanceWallet, Stars, ExpandMore, ExpandLess, AttachMoney } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Elements } from '@stripe/react-stripe-js';
@@ -31,6 +38,8 @@ import api from '../services/api';
 import stripePromise from '../config/stripe';
 import PaymentForm from '../components/PaymentForm';
 import { useAuth } from '../hooks/useAuth';
+import { getWallet, Wallet as WalletType } from '../services/walletService';
+import { getLoyaltyAccount, calculatePotentialPoints, calculateDiscountFromPoints, LoyaltyAccount } from '../services/loyaltyService';
 
 const Checkout: React.FC = () => {
     const navigate = useNavigate();
@@ -51,10 +60,58 @@ const Checkout: React.FC = () => {
     const [promoMessage, setPromoMessage] = useState<string | null>(null);
     const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
+    // Wallet state
+    const [walletBalance, setWalletBalance] = useState<number>(0);
+    const [useWallet, setUseWallet] = useState(false);
+    const [walletExpanded, setWalletExpanded] = useState(false);
+
+    // Loyalty state
+    const [loyaltyPoints, setLoyaltyPoints] = useState<number>(0);
+    const [loyaltyTier, setLoyaltyTier] = useState<string>('bronze');
+    const [useLoyalty, setUseLoyalty] = useState(false);
+    const [pointsToRedeem, setPointsToRedeem] = useState<number>(0);
+    const [loyaltyExpanded, setLoyaltyExpanded] = useState(false);
+
+    // Load wallet and loyalty data
+    useEffect(() => {
+        const fetchWalletAndLoyalty = async () => {
+            try {
+                const [walletData, loyaltyData] = await Promise.all([
+                    getWallet().catch(() => null),
+                    getLoyaltyAccount().catch(() => null)
+                ]);
+                
+                if (walletData?.wallet) {
+                    setWalletBalance(walletData.wallet.balance);
+                }
+                if (loyaltyData) {
+                    setLoyaltyPoints(loyaltyData.points);
+                    setLoyaltyTier(loyaltyData.tier);
+                }
+            } catch (err) {
+                console.log('Could not load wallet/loyalty data');
+            }
+        };
+        fetchWalletAndLoyalty();
+    }, []);
+
     const subtotal = cart.total;
     const deliveryFee = 2.99;
     const discountAmount = Number((subtotal * promoDiscount).toFixed(2));
-    const totalAmount = Math.max(subtotal - discountAmount + deliveryFee, 0);
+    
+    // Calculate loyalty discount
+    const loyaltyDiscount = useLoyalty ? calculateDiscountFromPoints(pointsToRedeem) : 0;
+    
+    // Calculate wallet discount
+    const walletDiscount = useWallet && walletBalance > 0 ? Math.min(walletBalance, subtotal - discountAmount - loyaltyDiscount) : 0;
+    
+    // Final total after all discounts
+    const totalAfterDiscounts = Math.max(subtotal - discountAmount - loyaltyDiscount - walletDiscount + deliveryFee, 0);
+    const totalAmount = totalAfterDiscounts;
+    
+    // Calculate points to be earned
+    const potentialPoints = calculatePotentialPoints(totalAfterDiscounts, loyaltyTier);
+    
     const checkoutSteps = ['Delivery Details', 'Payment', 'Confirmation'];
     const activeStep = Math.min((address ? 1 : 0) + (paymentMethod ? 1 : 0), checkoutSteps.length - 1);
     const stripeOptions = useMemo(() => (
@@ -327,6 +384,130 @@ const Checkout: React.FC = () => {
                                 <FormControlLabel value="cash" control={<Radio />} label="Cash on Delivery" />
                             </RadioGroup>
 
+                            {/* Wallet Option */}
+                            {walletBalance > 0 && (
+                                <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                                    <Box 
+                                        display="flex" 
+                                        alignItems="center" 
+                                        justifyContent="space-between"
+                                        onClick={() => setWalletExpanded(!walletExpanded)}
+                                        sx={{ cursor: 'pointer' }}
+                                    >
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <AccountBalanceWallet color="primary" />
+                                            <Typography fontWeight="bold">
+                                                Use Wallet Balance
+                                            </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Chip 
+                                                label={`${walletBalance.toFixed(2)} available`} 
+                                                color="success" 
+                                                size="small" 
+                                            />
+                                            {walletExpanded ? <ExpandLess /> : <ExpandMore />}
+                                        </Box>
+                                    </Box>
+                                    <Collapse in={walletExpanded}>
+                                        <Box sx={{ mt: 2 }}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={useWallet}
+                                                        onChange={(e) => setUseWallet(e.target.checked)}
+                                                    />
+                                                }
+                                                label={
+                                                    <Typography>
+                                                        Apply ${walletDiscount.toFixed(2)} from wallet
+                                                    </Typography>
+                                                }
+                                            />
+                                            <Typography variant="caption" color="text.secondary" display="block">
+                                                This amount will be deducted from your wallet balance
+                                            </Typography>
+                                        </Box>
+                                    </Collapse>
+                                </Paper>
+                            )}
+
+                            {/* Loyalty Points Option */}
+                            {loyaltyPoints > 0 && (
+                                <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                                    <Box 
+                                        display="flex" 
+                                        alignItems="center" 
+                                        justifyContent="space-between"
+                                        onClick={() => setLoyaltyExpanded(!loyaltyExpanded)}
+                                        sx={{ cursor: 'pointer' }}
+                                    >
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Stars color="warning" />
+                                            <Typography fontWeight="bold">
+                                                Loyalty Points
+                                            </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Chip 
+                                                label={`${loyaltyPoints.toLocaleString()} points`} 
+                                                color="warning" 
+                                                size="small" 
+                                            />
+                                            {loyaltyExpanded ? <ExpandLess /> : <ExpandMore />}
+                                        </Box>
+                                    </Box>
+                                    <Collapse in={loyaltyExpanded}>
+                                        <Box sx={{ mt: 2 }}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={useLoyalty}
+                                                        onChange={(e) => setUseLoyalty(e.target.checked)}
+                                                    />
+                                                }
+                                                label={
+                                                    <Typography>
+                                                        Redeem points for discount
+                                                    </Typography>
+                                                }
+                                            />
+                                            {useLoyalty && (
+                                                <Box sx={{ mt: 1, ml: 4 }}>
+                                                    <TextField
+                                                        type="number"
+                                                        size="small"
+                                                        label="Points to redeem"
+                                                        value={pointsToRedeem}
+                                                        onChange={(e) => {
+                                                            const val = Math.min(Math.max(0, parseInt(e.target.value) || 0), loyaltyPoints);
+                                                            setPointsToRedeem(val);
+                                                        }}
+                                                        inputProps={{ max: loyaltyPoints }}
+                                                        helperText={`= ${calculateDiscountFromPoints(pointsToRedeem).toFixed(2)} discount`}
+                                                    />
+                                                    <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                        {[100, 250, 500, 1000].map((amt) => (
+                                                            <Chip
+                                                                key={amt}
+                                                                label={`${amt} pts`}
+                                                                onClick={() => setPointsToRedeem(Math.min(amt, loyaltyPoints))}
+                                                                color={pointsToRedeem === amt ? 'primary' : 'default'}
+                                                                size="small"
+                                                                sx={{ cursor: 'pointer' }}
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            )}
+                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                                                You'll earn ~{potentialPoints.totalPoints} points on this order!
+                                            </Typography>
+                                        </Box>
+                                    </Collapse>
+                                </Paper>
+                            )}
+
                             {paymentMethod === 'card' && (
                                 <Box sx={{ mt: 2 }}>
                                     {clientSecret ? (
@@ -384,6 +565,18 @@ const Checkout: React.FC = () => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography color="success.main">Promo Discount</Typography>
                                     <Typography fontWeight="bold" color="success.main">- ${discountAmount.toFixed(2)}</Typography>
+                                </Box>
+                            )}
+                            {useLoyalty && loyaltyDiscount > 0 && (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography color="warning.main">Loyalty Discount</Typography>
+                                    <Typography fontWeight="bold" color="warning.main">- ${loyaltyDiscount.toFixed(2)}</Typography>
+                                </Box>
+                            )}
+                            {useWallet && walletDiscount > 0 && (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography color="primary.main">Wallet</Typography>
+                                    <Typography fontWeight="bold" color="primary.main">- ${walletDiscount.toFixed(2)}</Typography>
                                 </Box>
                             )}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>

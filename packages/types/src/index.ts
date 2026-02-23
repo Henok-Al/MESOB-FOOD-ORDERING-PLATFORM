@@ -88,8 +88,11 @@ export interface Order {
     id?: string;
     user: User | string;
     restaurant: Restaurant | string;
+    driver?: User | string;
     items: OrderItem[];
     totalAmount: number;
+    deliveryFee?: number;
+    tipAmount?: number;
     status: OrderStatus;
     deliveryAddress: string;
     paymentMethod: 'card' | 'cash';

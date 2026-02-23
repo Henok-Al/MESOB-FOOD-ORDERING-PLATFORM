@@ -14,10 +14,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 flexDirection: 'column',
                 minHeight: '100vh',
                 background: (theme) => theme.palette.background.default,
-                backgroundImage: (theme) => `
-                    radial-gradient(circle at 20% 15%, rgba(213,159,101,0.14), transparent 30%),
-                    radial-gradient(circle at 80% 10%, rgba(44,26,18,0.08), transparent 24%),
-                    radial-gradient(circle at 50% 80%, rgba(44,26,18,0.06), transparent 35%)`,
+                backgroundImage: `
+                    radial-gradient(circle at 22% 16%, rgba(225,25,49,0.12), transparent 32%),
+                    radial-gradient(circle at 78% 4%, rgba(240,197,66,0.1), transparent 30%)`,
             }}
         >
             <Navbar />

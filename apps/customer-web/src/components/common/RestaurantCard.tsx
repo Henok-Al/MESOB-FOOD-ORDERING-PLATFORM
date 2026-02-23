@@ -48,6 +48,9 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                 position: 'relative',
                 cursor: 'pointer',
                 overflow: 'hidden',
+                background: 'linear-gradient(180deg, #0f0c0d, #181315)',
+                color: '#f7f2e9',
+                border: '1px solid rgba(255,255,255,0.04)',
             }}
             onClick={() => navigate(`/restaurant/${restaurant._id || restaurant.id}`)}
         >
@@ -57,7 +60,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                     height="220"
                     image={restaurant.imageUrl}
                     alt={restaurant.name}
-                    sx={{ filter: 'saturate(1.05)' }}
+                    sx={{ filter: 'saturate(1.08)', opacity: 0.95 }}
                 />
                 <IconButton
                     sx={{
@@ -128,16 +131,16 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
             <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="h6" component="h2" fontWeight={800} noWrap>
+                        <Typography variant="h6" component="h2" fontWeight={800} noWrap color="inherit">
                             {restaurant.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap>
+                        <Typography variant="body2" color="rgba(247,242,233,0.7)" noWrap>
                             {restaurant.cuisine}
                         </Typography>
                     </Box>
                     <Tooltip title="Average rating">
-                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(213,159,101,0.12)', px: 1, py: 0.3, borderRadius: 999 }}>
-                            <Typography variant="body2" fontWeight={800} sx={{ mr: 0.5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(193,129,90,0.2)', px: 1, py: 0.3, borderRadius: 999 }}>
+                            <Typography variant="body2" fontWeight={800} sx={{ mr: 0.5 }} color="inherit">
                                 {restaurant.rating?.toFixed?.(1) || restaurant.rating}
                             </Typography>
                             <Rating value={1} max={1} size="small" readOnly />
@@ -145,7 +148,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                     </Tooltip>
                 </Box>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.5 }} noWrap>
+                <Typography variant="body2" color="rgba(247,242,233,0.72)" sx={{ mb: 1.5, lineHeight: 1.5 }} noWrap>
                     {restaurant.description}
                 </Typography>
 
@@ -162,7 +165,8 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
                                     fontSize: '0.72rem',
                                     height: 22,
                                     borderRadius: 999,
-                                    borderColor: 'rgba(31,18,12,0.12)',
+                                    borderColor: 'rgba(247,242,233,0.2)',
+                                    color: '#f7f2e9',
                                 }}
                             />
                         ))}

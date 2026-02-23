@@ -1,40 +1,45 @@
-import express from 'express';
+import { Router } from 'express';
 import {
-    getNotifications,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    subscribeToPushNotifications,
-    sendTestPushNotification,
-    sendPushNotification,
+  getNotifications,
+  getUnreadCount,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  subscribeToPush,
+  unsubscribeFromPush,
+  sendTestNotification,
 } from '../controllers/notificationController';
-import { protect, requireRole } from '../middleware/auth';
-import { UserRole } from '@food-ordering/constants';
 
-const router = express.Router();
+const router = Router();
 
-router.use(protect);
+// Get all notifications
+router.get('/', getNotifications);
 
-router.route('/')
-    .get(getNotifications);
+// Get unread count
+router.get('/unread-count', getUnreadCount);
 
-router.route('/read-all')
-    .patch(markAllAsRead);
+// Mark notification as read
+router.patch('/:id/read', markAsRead);
 
-router.route('/:id/read')
-    .patch(markAsRead);
+// Mark all as read
+router.patch('/read-all', markAllAsRead);
 
-router.route('/:id')
-    .delete(deleteNotification);
+// Delete notification
+router.delete('/:id', deleteNotification);
 
-// Firebase Push Notification Routes
-router.route('/subscribe')
-    .post(subscribeToPushNotifications);
+// Get preferences
+router.get('/preferences', getNotificationPreferences);
 
-router.route('/test-push')
-    .post(requireRole(UserRole.ADMIN), sendTestPushNotification);
+// Update preferences
+router.patch('/preferences', updateNotificationPreferences);
 
-router.route('/send-push')
-    .post(requireRole(UserRole.ADMIN), sendPushNotification);
+// Push notification routes
+router.post('/push/subscribe', subscribeToPush);
+router.delete('/push/unsubscribe', unsubscribeFromPush);
+
+// Test notification
+router.post('/test', sendTestNotification);
 
 export default router;

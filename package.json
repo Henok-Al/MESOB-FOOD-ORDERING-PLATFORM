@@ -9,10 +9,11 @@
         "backend"
     ],
     "scripts": {
-        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:customer\" \"npm run dev:admin\"",
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:customer\" \"npm run dev:admin\" \"npm run dev:driver\"",
         "dev:backend": "npm run dev --workspace=backend",
         "dev:customer": "npm run dev --workspace=apps/customer-web",
         "dev:admin": "npm run dev --workspace=apps/admin-dashboard",
+        "dev:driver": "npm run start --workspace=apps/driver-mobile",
         "build": "turbo run build",
         "test": "npm run test --workspaces",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
@@ -45,8 +46,9 @@
         "axios": "^1.13.2",
         "formik": "^2.4.9",
         "lucide-react": "^0.555.0",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-native": "0.73.6",
         "react-redux": "^9.2.0",
         "react-router-dom": "^7.9.6",
         "yup": "^1.7.1"

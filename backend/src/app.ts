@@ -16,6 +16,16 @@ import notificationRoutes from './routes/notificationRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import categoryRoutes from './routes/categoryRoutes';
+import driverRoutes from './routes/driverRoutes';
+import favoriteRoutes from './routes/favoriteRoutes';
+import couponRoutes from './routes/couponRoutes';
+import loyaltyRoutes from './routes/loyaltyRoutes';
+import addressRoutes from './routes/addressRoutes';
+import tipRoutes from './routes/tipRoutes';
+import adminRoutes from './routes/adminRoutes';
+import trackingRoutes from './routes/trackingRoutes';
+import walletRoutes from './routes/walletRoutes';
+import groupOrderRoutes from './routes/groupOrderRoutes';
 import { seedProducts } from './controllers/productController';
 
 const app = express();
@@ -39,7 +49,7 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
-app.use('/api/products', productRoutes); // Direct access if needed
+app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/users', userRoutes);
@@ -49,6 +59,16 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/restaurants/:restaurantId/categories', categoryRoutes);
+app.use('/api/driver', driverRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/tips', tipRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/tracking', trackingRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/group-orders', groupOrderRoutes);
 
 // Nest products under restaurants
 // Note: In a real app, we'd mount this in restaurantRoutes.js, but for simplicity:
@@ -71,6 +91,18 @@ io.on('connection', (socket) => {
     socket.on('joinRestaurant', (restaurantId: string) => {
         socket.join(`restaurant-${restaurantId}`);
         console.log(`Restaurant ${restaurantId} dashboard joined`);
+    });
+
+    // Join order-specific room for live tracking
+    socket.on('joinOrder', (orderId: string) => {
+        socket.join(`order-${orderId}`);
+        console.log(`Client joined order room: ${orderId}`);
+    });
+
+    // Leave order room
+    socket.on('leaveOrder', (orderId: string) => {
+        socket.leave(`order-${orderId}`);
+        console.log(`Client left order room: ${orderId}`);
     });
 
     socket.on('disconnect', () => {

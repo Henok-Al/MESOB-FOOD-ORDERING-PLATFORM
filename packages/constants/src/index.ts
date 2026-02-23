@@ -1,5 +1,7 @@
 export const APP_NAME = 'Mesob Food Ordering';
 
+export * from './frankTheme';
+
 export enum UserRole {
     CUSTOMER = 'customer',
     RESTAURANT_OWNER = 'restaurant_owner',

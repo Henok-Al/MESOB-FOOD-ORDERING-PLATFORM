@@ -1,84 +1,125 @@
 import { createTheme } from '@mui/material/styles';
+import { FRANK_COLORS } from '@food-ordering/constants';
 
-// Warm, café-inspired palette inspired by Coffeemania
-const palette = {
-    primary: '#2c1a12', // espresso
-    secondary: '#d59f65', // caramel
-    ink: '#1f120c',
-    surface: '#f6f0e7', // latte foam
-    card: '#fffaf3',
-    success: '#3ba17c',
-    warning: '#e48a3c',
-    error: '#d14545',
-};
-
-export const getTheme = (darkMode: boolean = false) => createTheme({
+// FRANK by БАСТА - Official Design System
+// Dark theme with orange accents
+export const getTheme = (darkMode: boolean = true) => createTheme({
     palette: {
-        mode: darkMode ? 'dark' : 'light',
+        mode: 'dark',
         primary: {
-            main: palette.primary,
-            dark: '#0b5f5a',
-            light: '#8bd8d3',
-            contrastText: '#ffffff',
+            main: FRANK_COLORS.orange,
+            dark: FRANK_COLORS.orangeDark,
+            light: FRANK_COLORS.orangeLight,
+            contrastText: '#fff',
         },
         secondary: {
-            main: palette.secondary,
-            contrastText: '#0b132b',
+            main: FRANK_COLORS.success,
+            contrastText: '#fff',
         },
-        success: { main: palette.success },
-        warning: { main: palette.warning },
-        error: { main: palette.error },
+        success: { main: FRANK_COLORS.success },
+        warning: { main: FRANK_COLORS.warning },
+        error: { main: FRANK_COLORS.error },
         background: {
-            default: darkMode ? '#0b1021' : palette.surface,
-            paper: darkMode ? '#0f172a' : palette.card,
+            default: FRANK_COLORS.bgPrimary,
+            paper: FRANK_COLORS.bgCard,
         },
         text: {
-            primary: darkMode ? '#f1f5f9' : palette.ink,
-            secondary: darkMode ? '#cbd5e1' : '#475569',
-            disabled: darkMode ? '#64748b' : '#94a3b8',
+            primary: FRANK_COLORS.textPrimary,
+            secondary: FRANK_COLORS.textSecondary,
+            disabled: FRANK_COLORS.textMuted,
         },
-        divider: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(12,18,32,0.12)',
+        divider: FRANK_COLORS.border,
     },
     typography: {
-        fontFamily: '"Sora", "Inter", "Helvetica Neue", Arial, sans-serif',
-        h1: { fontFamily: '"Playfair Display", "Sora", serif', fontWeight: 800, letterSpacing: '-0.04em', fontSize: '3.4rem', lineHeight: 1.05 },
-        h2: { fontFamily: '"Playfair Display", "Sora", serif', fontWeight: 750, letterSpacing: '-0.03em', fontSize: '2.6rem', lineHeight: 1.15 },
-        h3: { fontFamily: '"Playfair Display", "Sora", serif', fontWeight: 700, letterSpacing: '-0.02em', fontSize: '2.1rem', lineHeight: 1.2 },
-        h4: { fontWeight: 700, fontSize: '1.6rem', lineHeight: 1.3 },
-        h5: { fontWeight: 650, fontSize: '1.35rem', lineHeight: 1.35 },
-        h6: { fontWeight: 600, fontSize: '1.1rem', lineHeight: 1.4, letterSpacing: '0.01em' },
-        body1: { fontWeight: 400, fontSize: '1rem', lineHeight: 1.72 },
-        body2: { fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.55 },
-        button: { fontWeight: 700, textTransform: 'none', letterSpacing: '0.03em' },
-        overline: { letterSpacing: '0.26em', fontWeight: 700 },
+        fontFamily: '"Inter", "SF Pro Display", "Helvetica Neue", Arial, sans-serif',
+        h1: { 
+            fontWeight: 800, 
+            letterSpacing: '-0.02em', 
+            fontSize: '3rem', 
+            lineHeight: 1.1,
+            textTransform: 'uppercase',
+        },
+        h2: { 
+            fontWeight: 800, 
+            letterSpacing: '-0.02em', 
+            fontSize: '2.25rem', 
+            lineHeight: 1.2,
+            textTransform: 'uppercase',
+        },
+        h3: { 
+            fontWeight: 700, 
+            letterSpacing: '-0.01em', 
+            fontSize: '1.75rem', 
+            lineHeight: 1.2,
+            textTransform: 'uppercase',
+        },
+        h4: { 
+            fontWeight: 700, 
+            fontSize: '1.5rem', 
+            lineHeight: 1.3,
+            textTransform: 'uppercase',
+        },
+        h5: { 
+            fontWeight: 700, 
+            fontSize: '1.25rem', 
+            lineHeight: 1.4,
+            textTransform: 'uppercase',
+        },
+        h6: { 
+            fontWeight: 600, 
+            fontSize: '1rem', 
+            lineHeight: 1.4,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+        },
+        body1: { 
+            fontWeight: 400, 
+            fontSize: '1rem', 
+            lineHeight: 1.6,
+        },
+        body2: { 
+            fontWeight: 400, 
+            fontSize: '0.875rem', 
+            lineHeight: 1.5,
+        },
+        button: { 
+            fontWeight: 700, 
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+        },
+        overline: { 
+            letterSpacing: '0.1em', 
+            fontWeight: 700,
+            textTransform: 'uppercase',
+        },
     },
-    shape: { borderRadius: 14 },
+    shape: { borderRadius: 12 },
     components: {
         MuiCssBaseline: {
             styleOverrides: `
-                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Sora:wght@400;500;600;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
                 body {
-                    background: radial-gradient(circle at 10% 10%, rgba(217,159,101,0.12), transparent 26%),
-                                radial-gradient(circle at 80% 5%, rgba(44,26,18,0.08), transparent 28%),
-                                radial-gradient(circle at 60% 70%, rgba(44,26,18,0.05), transparent 35%),
-                                ${palette.surface};
-                    color: ${palette.ink};
+                    background: ${FRANK_COLORS.bgPrimary};
+                    color: ${FRANK_COLORS.textPrimary};
                 }
                 ::selection {
-                    background: ${palette.primary};
+                    background: ${FRANK_COLORS.orange};
                     color: #fff;
                 }
                 * {
                     scrollbar-width: thin;
-                    scrollbar-color: ${palette.primary} transparent;
+                    scrollbar-color: ${FRANK_COLORS.orange} ${FRANK_COLORS.bgSecondary};
                 }
                 *::-webkit-scrollbar {
-                    width: 10px;
-                    height: 10px;
+                    width: 8px;
+                    height: 8px;
+                }
+                *::-webkit-scrollbar-track {
+                    background: ${FRANK_COLORS.bgSecondary};
                 }
                 *::-webkit-scrollbar-thumb {
-                    background: linear-gradient(180deg, ${palette.primary}, ${palette.secondary});
-                    border-radius: 999px;
+                    background: ${FRANK_COLORS.orange};
+                    border-radius: 4px;
                 }
             `,
         },
@@ -86,49 +127,57 @@ export const getTheme = (darkMode: boolean = false) => createTheme({
             styleOverrides: {
                 root: {
                     borderRadius: 12,
-                    padding: '11px 20px',
-                    boxShadow: '0 10px 30px rgba(44,26,18,0.14)',
-                    transition: 'all 0.18s ease',
-                    '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 12px 32px rgba(44,26,18,0.2)' },
+                    padding: '12px 24px',
+                    boxShadow: 'none',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { 
+                        transform: 'translateY(-2px)', 
+                        boxShadow: `0 8px 20px ${FRANK_COLORS.orange}40`,
+                    },
                 },
                 containedPrimary: {
-                    background: 'linear-gradient(120deg, #2c1a12, #a96c3f)',
+                    background: FRANK_COLORS.orange,
+                    '&:hover': { 
+                        background: FRANK_COLORS.orangeLight,
+                    },
                 },
                 containedSecondary: {
-                    background: '#fff',
-                    color: palette.ink,
-                    border: '1px solid rgba(12,18,32,0.08)',
-                    boxShadow: '0 10px 30px rgba(12,18,32,0.08)',
-                    '&:hover': { background: '#fdfaf4' },
+                    background: FRANK_COLORS.bgElevated,
+                    color: FRANK_COLORS.textPrimary,
+                    '&:hover': { 
+                        background: FRANK_COLORS.border,
+                    },
                 },
                 outlined: {
                     borderRadius: 12,
                     borderWidth: 2,
-                    borderColor: 'rgba(12,18,32,0.12)',
-                    '&:hover': { borderColor: palette.primary, background: 'rgba(15,118,110,0.06)' },
+                    borderColor: FRANK_COLORS.border,
+                    '&:hover': { 
+                        borderColor: FRANK_COLORS.orange, 
+                        background: `${FRANK_COLORS.orange}10`,
+                    },
                 },
             },
         },
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    borderRadius: 18,
-                    border: '1px solid rgba(12,18,32,0.06)',
-                    boxShadow: '0 12px 40px rgba(12,18,32,0.06)',
+                    borderRadius: 16,
+                    border: `1px solid ${FRANK_COLORS.border}`,
+                    background: FRANK_COLORS.bgCard,
                 },
             },
         },
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 18,
-                    border: '1px solid rgba(31,18,12,0.08)',
-                    boxShadow: '0 16px 45px rgba(31,18,12,0.08)',
+                    borderRadius: 16,
+                    border: `1px solid ${FRANK_COLORS.border}`,
+                    background: FRANK_COLORS.bgCard,
                     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    backdropFilter: 'blur(4px)',
                     '&:hover': {
                         transform: 'translateY(-4px)',
-                        boxShadow: '0 24px 60px rgba(31,18,12,0.16)',
+                        boxShadow: `0 20px 40px rgba(0,0,0,0.4)`,
                     },
                 },
             },
@@ -138,11 +187,14 @@ export const getTheme = (darkMode: boolean = false) => createTheme({
                 root: {
                     '& .MuiOutlinedInput-root': {
                         borderRadius: 12,
-                        backgroundColor: darkMode ? 'rgba(255,255,255,0.03)' : '#ffffff',
-                        border: '1px solid rgba(12,18,32,0.08)',
+                        backgroundColor: FRANK_COLORS.bgSecondary,
+                        border: `1px solid ${FRANK_COLORS.border}`,
                         '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'rgba(12,18,32,0.15)' },
-                        '&.Mui-focused fieldset': { borderColor: palette.primary, borderWidth: 1.5 },
+                        '&:hover fieldset': { borderColor: FRANK_COLORS.borderLight },
+                        '&.Mui-focused fieldset': { 
+                            borderColor: FRANK_COLORS.orange, 
+                            borderWidth: 2,
+                        },
                     },
                 },
             },
@@ -150,18 +202,24 @@ export const getTheme = (darkMode: boolean = false) => createTheme({
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    background: 'rgba(255,255,255,0.82)',
-                    backdropFilter: 'blur(14px)',
-                    borderBottom: '1px solid rgba(12,18,32,0.06)',
-                    boxShadow: '0 12px 40px rgba(12,18,32,0.06)',
+                    background: `${FRANK_COLORS.bgPrimary}ee`,
+                    backdropFilter: 'blur(20px)',
+                    borderBottom: `1px solid ${FRANK_COLORS.border}`,
+                    boxShadow: 'none',
                 },
             },
         },
         MuiChip: {
             styleOverrides: {
                 root: {
-                    borderRadius: 12,
-                    fontWeight: 600,
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                },
+                colorSuccess: {
+                    background: `${FRANK_COLORS.success}20`,
+                    color: FRANK_COLORS.success,
                 },
             },
         },
@@ -170,8 +228,35 @@ export const getTheme = (darkMode: boolean = false) => createTheme({
                 maxWidth: 'xl',
             },
         },
+        MuiDrawer: {
+            styleOverrides: {
+                paper: {
+                    background: FRANK_COLORS.bgSecondary,
+                    borderRight: `1px solid ${FRANK_COLORS.border}`,
+                },
+            },
+        },
+        MuiListItemButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 8,
+                    margin: '4px 8px',
+                    '&:hover': {
+                        background: FRANK_COLORS.bgElevated,
+                    },
+                    '&.Mui-selected': {
+                        background: `${FRANK_COLORS.orange}20`,
+                        color: FRANK_COLORS.orange,
+                        '&:hover': {
+                            background: `${FRANK_COLORS.orange}30`,
+                        },
+                    },
+                },
+            },
+        },
     },
 });
 
 // Export default theme for backward compatibility
-export const theme = getTheme(false);
+export const theme = getTheme(true);
+

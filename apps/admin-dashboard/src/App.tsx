@@ -14,6 +14,9 @@ import RestaurantOrdersPage from './pages/restaurant/Orders';
 import RestaurantAnalyticsPage from './pages/restaurant/Analytics';
 import Unauthorized from './pages/Unauthorized';
 import Reviews from './pages/Reviews';
+import Coupons from './pages/Coupons';
+import Drivers from './pages/Drivers';
+import DeliveryAreas from './pages/DeliveryAreas';
 import { UserRole } from '@food-ordering/constants';
 
 const queryClient = new QueryClient();
@@ -57,6 +60,21 @@ function App() {
               <Route path="reviews" element={
                 <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
                   <Reviews />
+                </ProtectedRoute>
+              } />
+              <Route path="coupons" element={
+                <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+                  <Coupons />
+                </ProtectedRoute>
+              } />
+              <Route path="drivers" element={
+                <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+                  <Drivers />
+                </ProtectedRoute>
+              } />
+              <Route path="delivery-areas" element={
+                <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+                  <DeliveryAreas />
                 </ProtectedRoute>
               } />
 

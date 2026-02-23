@@ -184,9 +184,9 @@ const Navbar: React.FC = () => {
                 elevation={0}
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    background: 'linear-gradient(180deg, rgba(255,250,243,0.95), rgba(255,250,243,0.75))',
-                    backdropFilter: 'blur(14px)',
-                    borderBottom: '1px solid rgba(31,18,12,0.08)',
+                    background: 'linear-gradient(180deg, rgba(15,12,13,0.95), rgba(15,12,13,0.78))',
+                    backdropFilter: 'blur(12px)',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
                 }}
             >
                 <Toolbar sx={{ minHeight: 78, display: 'flex', gap: 2 }}>
@@ -226,7 +226,7 @@ const Navbar: React.FC = () => {
                                     width: 36,
                                     height: 36,
                                     borderRadius: 12,
-                                    background: 'linear-gradient(140deg, #2c1a12, #a96c3f)',
+                                    background: 'linear-gradient(140deg, #b11226, #7a0b1a)',
                                     display: 'grid',
                                     placeItems: 'center',
                                     color: 'white',
@@ -287,13 +287,13 @@ const Navbar: React.FC = () => {
                             component="form"
                             onSubmit={handleSearch}
                             sx={{
-                                p: '5px 8px',
+                                p: '6px 10px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                background: 'rgba(255,250,243,0.92)',
+                                background: 'rgba(255,247,239,0.95)',
                                 borderRadius: '16px',
-                                border: '1px solid rgba(31,18,12,0.08)',
-                                boxShadow: '0 10px 30px rgba(31,18,12,0.08)',
+                                border: '1px solid rgba(26,15,15,0.08)',
+                                boxShadow: '0 12px 30px rgba(26,15,15,0.1)',
                             }}
                         >
                             <IconButton type="submit" sx={{ p: '10px', color: 'text.primary' }} aria-label="search">
